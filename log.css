@@ -1,0 +1,305 @@
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+@keyframes slideUpFade {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* --- LOAD SF COMPACT ROUNDED FONT --- */
+@font-face {
+    font-family: 'SF Compact Rounded';
+    src: url('../fonts/SF-Compact-Rounded-Regular.otf') format('opentype');
+    font-weight: 400; 
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'SF Compact Rounded';
+    src: url('../fonts/SF-Compact-Rounded-Bold.otf') format('opentype');
+    font-weight: 700; 
+    font-style: normal;
+}
+
+
+body {
+    /* Sets the background image strictly to the left side */
+    background-image: url('assets/side_view2.png');
+    background-size: 100% 100%; 
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-color: #E9EAEE;
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+     font-family: 'SF Compact Rounded', system-ui, -apple-system, sans-serif;
+    
+    display: flex;
+    justify-content: flex-end; 
+    overflow-x: hidden;
+
+    animation: fadeIn 1s ease-in-out; 
+}
+
+.right-panel {
+    width: 45%; 
+    padding: 5% 8%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    opacity: 0;
+    animation: slideUpFade 0.8s ease-out 0.4s forwards; 
+}
+
+.brand-header {
+    position: absolute;
+    right: 65px;
+    bottom: 75%;
+    width: 83%;
+
+    opacity: 0;
+    animation: slideUpFade 0.8s ease-out 0.2s forwards;
+}
+
+.ticket {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.sub img {
+    max-width: 100%;
+    height: auto;
+}
+
+form {
+    width: 100%;
+    padding-top: 25%;
+}
+
+.form-group {
+    margin-bottom: 40px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 16px;
+    color: #111;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 16px;
+    border: 1px solid #555;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    outline: none;
+}
+
+.form-control:focus {
+    border-color: #3b4578;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    color: #ffffff;
+    cursor: pointer;
+    background: linear-gradient(to bottom, #6373a7, #3b4578);
+    border: 1px solid #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+.btn-primary:active {
+    transform: scale(0.98); 
+}
+
+.divider {
+    margin: 40px 0 10px 0;
+    font-size: 12px;
+    color: #555;
+}
+
+.google-btn-container {
+    width: 100%;
+}
+
+.google-btn-container img {
+    width: 100%;
+    height: auto;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+/* Footer */
+.footer-text {
+    padding-left: 34%;
+    margin-top: 15px;
+    font-size: 12px;
+    color: #333;
+}
+
+.footer-text a {
+    color: #0000ee;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.divider-container {
+    display: flex;
+    align-items: center;
+    margin: 25px 0;
+}
+
+.divider-line {
+    flex-grow: 1;
+    height: 1px;
+    background-color: #999;
+}
+
+.divider-text {
+    margin: 0 15px;
+    font-size: 11px;
+    color: #555;
+}
+
+/* --- Google Account Modal --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none; /* Hidden by default until JS triggers it */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 8px;
+    padding: 30px 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+.modal-title {
+    font-size: 22px;
+    font-weight: 400;
+    color: #202124;
+    margin-bottom: 5px;
+}
+
+.modal-subtitle {
+    font-size: 14px;
+    color: #5f6368;
+    margin-bottom: 20px;
+}
+
+.account-list {
+    text-align: left;
+}
+
+.account-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.account-item:hover {
+    background-color: #f8f9fa;
+}
+
+.account-item:last-child {
+    border-bottom: none;
+}
+
+.account-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.use-another {
+    background-color: transparent;
+    color: #5f6368;
+    fill: #5f6368;
+}
+
+.account-info {
+    margin-left: 15px;
+}
+
+.account-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #3c4043;
+}
+
+.account-email {
+    font-size: 12px;
+    color: #5f6368;
+}
+
+.modal-divider {
+    height: 1px;
+    background-color: #dadce0;
+    margin: 10px 0;
+}
+
+.close-modal {
+    margin-top: 20px;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    color: #1a73e8;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.close-modal:hover {
+    background-color: #f1f3f4;
+}
