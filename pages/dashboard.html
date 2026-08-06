@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>TicketPedia</title>
-    <link rel="stylesheet" href="./css/global.css">
-    <link rel="stylesheet" href="./css/dashboard.css">
-    <link rel="stylesheet" href="./css/tab-style/buy.css">
 </head>
 <body>
     <nav>
@@ -245,9 +242,12 @@
         </div>
     </main>
 
-    <!-- PocketBase Session & UI Script -->
+    <!-- PocketBase Session, CSS Imports & UI Script -->
     <script type="module">
         import { pb } from '../src/pocketbase';
+        import './css/global.css';
+        import './css/dashboard.css';
+        import './css/tab-style/buy.css';
 
         // Check if user is logged in
         if (pb.authStore.isValid && pb.authStore.model) {
