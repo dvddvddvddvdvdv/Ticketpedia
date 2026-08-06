@@ -52,5 +52,20 @@
 
     </main>
 
+    <script type="module">
+        import { pb } from '../src/pocketbase';
+
+        if (pb.authStore.isValid && pb.authStore.model) {
+            const user = pb.authStore.model;
+            
+            const usernameEl = document.querySelector('#navUsername');
+            const emailEl = document.querySelector('#navEmail');
+
+            if (usernameEl) usernameEl.textContent = user.username || 'User';
+            if (emailEl) emailEl.textContent = user.email || '';
+        } else {
+            window.location.href = '../login.html';
+        }
+    </script>
 </body>
 </html>
