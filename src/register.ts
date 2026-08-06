@@ -28,7 +28,6 @@ form?.addEventListener('submit', async (e) => {
         };
 
         await pb.collection('users').create(data);
-
         await pb.collection('users').authWithPassword(email, password);
 
         alert('Registration Successful! Redirecting to dashboard...');
@@ -37,15 +36,24 @@ form?.addEventListener('submit', async (e) => {
     } catch (error: any) {
         console.error('Error registering:', error);
         
+        // PocketBase validation errors live inside error.response.data
         const fieldErrors = error.response?.data;
-        console.log('Exact Field Errors:', fieldErrors);
+        let alertMessage = 'Failed to register. Please check your inputs.';
 
         if (fieldErrors) {
+            // Grab the first field that caused an error (e.g., "password" or "email")
             const firstErrorField = Object.keys(fieldErrors)[0];
-            if (firstErrorField) {
+            
+            if (firstErrorField && fieldErrors[firstErrorField]?.message) {
+                // Capitalize the field name and show PocketBase's specific error text
+                const formattedField = firstErrorField.charAt(0).toUpperCase() + firstErrorField.slice(1);
+                alertMessage = `${formattedField}: ${fieldErrors[firstErrorField].message}`;
             }
+        } else if (error.message) {
+            // Fallback for network or general server errors
+            alertMessage = error.message;
         }
 
-        alert('Error: ');
+        alert('Error: ' + alertMessage);
     }
 });
