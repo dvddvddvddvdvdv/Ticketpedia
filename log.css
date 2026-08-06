@@ -37,16 +37,10 @@
 
 
 body {
-    /* Sets the background image strictly to the left side */
-    background-image: url('assets/side_view2.png');
-    background-size: 100% 100%; 
-    background-position: left top;
     background-repeat: no-repeat;
     background-color: #E9EAEE;
-    font-family: Arial, Helvetica, sans-serif;
     min-height: 100vh;
-     font-family: 'SF Compact Rounded', system-ui, -apple-system, sans-serif;
-    
+    font-family: 'SF Compact Rounded', system-ui, -apple-system, sans-serif;
     display: flex;
     justify-content: flex-end; 
     overflow-x: hidden;
@@ -283,6 +277,12 @@ form {
     color: #5f6368;
 }
 
+.left-content img {
+    position: relative;
+    bottom: 40px;
+    width: 80%;
+}
+
 .modal-divider {
     height: 1px;
     background-color: #dadce0;
@@ -302,4 +302,129 @@ form {
 
 .close-modal:hover {
     background-color: #f1f3f4;
+}
+
+/* Split the body so it handles both left and right sections side-by-side */
+body {
+    background-color: #E9EAEE;
+    min-height: 100vh;
+    font-family: 'SF Compact Rounded', system-ui, -apple-system, sans-serif;
+    display: flex;
+    justify-content: space-between; 
+    overflow-x: hidden;
+    animation: fadeIn 1s ease-in-out; 
+}
+
+/* --- Left Panel with Background Image & Text Overlay --- */
+.left-panel-bg {
+    width: 55%;
+    min-height: 100vh;
+    background-image: url('assets/side_view.png');
+    background-size: cover; 
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40px;
+}
+
+.left-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.left-badge {
+    color: #ffffff;
+    font-size: 152px;
+    font-weight: bold;
+}
+
+.left-text-block {
+    max-width: 450px;
+    margin-bottom: 40px;
+}
+
+.left-subtitle {
+    color: #ffffff;
+    font-size: 25px;
+    margin-bottom: 12px;
+    opacity: 0.9;
+}
+
+.left-title {
+    color: #ffffff;
+    font-size: 30px;
+    line-height: 1.4;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.left-line {
+    width: 100%;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+/* Adjust right panel to take the remaining 45% */
+.right-panel {
+    width: 45%; 
+    padding: 5% 8%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: #E9EAEE;
+    opacity: 0;
+    animation: slideUpFade 0.8s ease-out 0.4s forwards; 
+}
+
+/* --- RESPONSIVE MOBILE FIX --- */
+@media screen and (max-width: 768px) {
+    body {
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    /* Hide the large decorative background panel on mobile to save space */
+    .left-panel-bg {
+        display: none; 
+    }
+
+    /* Make the login/register form take up the full screen width on mobile */
+    .right-panel {
+        width: 100% !important;
+        min-height: 100vh;
+        padding: 40px 24px;
+        justify-content: center;
+        background-color: #E9EAEE;
+    }
+
+    /* Fix the brand header position for mobile screens */
+    .brand-header {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        width: 100%;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .ticket {
+        max-width: 180px;
+        margin: 0 auto;
+        display: block;
+    }
+
+    .sub img {
+        max-width: 200px;
+        margin: 5px auto 0 auto;
+        display: block;
+    }
+
+    form {
+        padding-top: 0;
+    }
 }

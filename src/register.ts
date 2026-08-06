@@ -27,10 +27,8 @@ form?.addEventListener('submit', async (e) => {
             "passwordConfirm": password
         };
 
-        // Create the user record in PocketBase
         await pb.collection('users').create(data);
 
-        // Automatically log them in right after registration
         await pb.collection('users').authWithPassword(email, password);
 
         alert('Registration Successful! Redirecting to dashboard...');
@@ -38,7 +36,16 @@ form?.addEventListener('submit', async (e) => {
 
     } catch (error: any) {
         console.error('Error registering:', error);
-        const errorMessage = error.data?.message || 'Could not connect to the database server.';
-        alert('Error: ' + errorMessage);
+        
+        const fieldErrors = error.response?.data;
+        console.log('Exact Field Errors:', fieldErrors);
+
+        if (fieldErrors) {
+            const firstErrorField = Object.keys(fieldErrors)[0];
+            if (firstErrorField) {
+            }
+        }
+
+        alert('Error: ');
     }
 });

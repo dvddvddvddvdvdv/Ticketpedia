@@ -3,10 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - TicketPedia</title>
+    <title>Login - TicketPedia</title>
     <link rel="stylesheet" href="log.css">
 </head>
 <body>
+    <div class="left-panel-bg">
+        <div class="left-content">
+            <span class="left-badge">*</span>
+            <img src="assets/ticketpedia_image.png" alt="">
+            <div class="left-text-block">
+                <p class="left-subtitle">Selamat Datang kembali.</p>
+                <h2 class="left-title">Masuk dengan akun Anda untuk mengelola reservasi dan riwayat tiket penerbangan.</h2>
+                <div class="left-line"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="right-panel">
         <div class="brand-header">
             <div class="title">
@@ -17,27 +29,22 @@
             </div>
         </div>
 
-        <form id="registerForm">
+        <form id="loginForm">
             <div class="form-group" style="margin-bottom: 20px;">
-                <label for="username">Username</label>
-                <input type="text" id="username" class="form-control" placeholder="Panca Admin">
-            </div>
-
-            <div class="form-group" style="margin-bottom: 20px;">
-                <label for="email">Email</label>
-                <input type="text" id="email" class="form-control" placeholder="panca@example.com">
+                <label for="identity">Email or Username</label>
+                <input type="text" id="identity" class="form-control" placeholder="panca@example.com or Panca Admin" required>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" class="form-control" placeholder="••••••••">
+                <input type="password" id="password" class="form-control" placeholder="••••••••" required>
             </div>
 
-            <button type="submit" class="btn-primary">login</button>
+            <button type="submit" class="btn-primary">Login</button>
         </form>
         
         <div class="footer-text" style="margin-top: 30px; text-align: center; padding-left: 0;">
-            belum punya akun? <a href="register.html">Signin</a>
+            belum punya akun? <a href="register.html">Sign Up</a>
         </div>
     </div>
 

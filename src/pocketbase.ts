@@ -1,3 +1,5 @@
 import PocketBase from 'pocketbase';
 
-export const pb = new PocketBase(import.meta.env.VITE_PB_URL || 'https://db.zizazu.id');
+const pbUrl = import.meta.env.VITE_PB_URL || 'https://db.zizazu.id';
+
+export const pb = new PocketBase(pbUrl);git add .

@@ -39,10 +39,10 @@
                 <a href="#"><img src="assets/Notif.png" alt=""></a>
                 <a href="#"><img src="assets/Email.png" alt=""></a>
                 <div class="user-profile">
-                    <a href="#"><img class="Profile_picture" src="assets/PP.png" alt=""></a>
+                    <a href="#"><img class="Profile_picture" src="assets/profiles/p1.png" alt=""></a>
                     <div class="divs">
-                        <p class="username">KamilTekno</p>
-                        <p class="Email-name">ssfsghau@gmail.com</p>
+                        <p id="navUsername" class="username">Loading...</p>
+                        <p id="navEmail" class="Email-name">...</p>
                     </div>
                 </div>
             </div>
@@ -52,7 +52,6 @@
     <main>
         <div class="tab-menu-container">
             <ul class="tab-list">
-                <!-- Added data-target to link to the content IDs -->
                 <li class="tab-link active" data-target="pembelian">Pembelian ticket</li>
                 <li class="tab-divider">|</li>
                 <li class="tab-link" data-target="aktif">Tiket Aktif</li>
@@ -63,21 +62,19 @@
             </ul>
         </div>
 
-        <!-- NEW: The Content Sections -->
+        <!-- The Content Sections -->
         <div id="pembelian" class="tab-content active-content">
-    
-        <div class="ticket-controls">
-            <input type="text" class="search-bar" placeholder="Search Bar">
-            <button class="filter-btn">
-                Filter 
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-            </button>
-            <button class="filter-tag">Direct</button>
-            <button class="filter-tag">Transit</button>
-        </div>
+            <div class="ticket-controls">
+                <input type="text" class="search-bar" placeholder="Search Bar">
+                <button class="filter-btn">
+                    Filter 
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                </button>
+                <button class="filter-tag">Direct</button>
+                <button class="filter-tag">Transit</button>
+            </div>
 
             <div class="ticket-list">
-                
                 <!-- TICKET WRAPPER 1 -->
                 <div class="ticket-wrapper">
                     <div class="ticket-card">
@@ -116,8 +113,7 @@
                         <h3 class="booking-title">Detail Penumpang</h3>
                         
                         <div class="form-row">
-                            <div class="input-group">
-                            </div>
+                            <div class="input-group"></div>
                             <div class="input-group" style="flex-grow: 1;">
                                 <label>Nama Lengkap (Sesuai KTP/Paspor)</label>
                                 <input type="text" class="booking-input" placeholder="Masukkan nama lengkap">
@@ -136,12 +132,11 @@
                         </div>
                     </div>
                 </div>
-        </div> <!-- ADD THIS: Closes .ticket-list -->
-    </div> <!-- ADD THIS: Closes #pembelian -->
+            </div>
+        </div>
 
         <div id="aktif" class="tab-content">
             <div class="active-ticket-grid">
-                
                 <!-- SINGLE ACTIVE TICKET CARD -->
                 <div class="active-ticket-card">
                     <div class="ticket-main-info">
@@ -190,122 +185,85 @@
                         <button class="action-btn"><img src="assets/icon/plane-tracker.png" alt=""> Lacak Penerbangan</button>
                     </div>
                 </div>
-
-                <div class="active-ticket-card">
-                    <div class="ticket-main-info">
-                        <div class="airline-column">
-                            <img src="assets/Airlines/Garuda.png" alt="Garuda Indonesia">
-                        </div>
-
-                        <div class="flight-info-column">
-                            <div class="route-title">Jakarta (CGK) &rarr; Bali (DPS)</div>
-                            <div class="flight-detail-row"><span><img src="assets/icon/calender-icon.png" alt=""></span> 12 Agustus 2026</div>
-                            <div class="flight-detail-row"><span><img src="assets/icon/time-icon.png" alt=""></span> 08.15 - 11.05 WIB</div>
-                            <div class="flight-detail-row"><span><img src="assets/icon/plane-icon.png" alt=""></span> GA-412</div>
-                            <div class="flight-detail-row"><span><img src="assets/icon/name-icon.png" alt=""></span> Caesar Ibrahim</div>
-                        </div>
-
-                        <div class="booking-id-column">
-                            <div class="status-badge">
-                                <span class="status-dot"></span> Siap Check-in
-                            </div>
-                            <div class="meta-block">
-                                <span class="meta-label">Booking ID</span>
-                                <span class="meta-value">GA8294</span>
-                            </div>
-                            <div class="meta-grid">
-                                <div>
-                                    <span class="meta-label">Gate</span>
-                                    <span class="meta-value">A12</span>
-                                </div>
-                                <div>
-                                    <span class="meta-label">Terminal</span>
-                                    <span class="meta-value">Terminal 3</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="qr-column">
-                            <img src="assets/qr1.png" alt="QR Code" class="qr-img">
-                            <a href="#" class="lihat-eticket">Lihat E-Ticket</a>
-                        </div>
-                    </div>
-
-                    <div class="ticket-actions">
-                        <button class="action-btn"><img src="assets/icon/detail-icon.png" alt=""> Lihat Detail</button>
-                        <button class="action-btn"><img src="assets/icon/ticket-small.png" alt=""> E-Ticket</button>
-                        <button class="action-btn success"><img src="assets/icon/check-icon.png" alt=""> Check-in Online</button>
-                        <button class="action-btn"><img src="assets/icon/plane-tracker.png" alt=""> Lacak Penerbangan</button>
-                    </div>
-                </div>
-                <!-- END SINGLE ACTIVE TICKET CARD -->
-                 
-
             </div>
         </div>
-
-        
         
         <div id="riwayat" class="tab-content">
             <h2>Riwayat Pemesanan Content</h2>
         </div>
         
-<div id="pembayaran" class="tab-content">
-    <div class="payment-card-container">
-        <h2 class="section-title">Konfirmasi Pembayaran</h2>
-        
-        <!-- Note: Added inline style to override the 3-column grid to 2-columns for this specific form -->
-        <div class="payment-form-grid" style="grid-template-columns: 1fr 1fr;">
-            
-            <!-- Kolom 1: Informasi Tagihan -->
-            <div class="form-column">
-                <div class="input-group">
-                    <label>Booking ID (PNR)</label>
-                    <input type="text" class="booking-input" value="97CMS8" disabled style="background-color: #E9EAEE; cursor: not-allowed;">
-                </div>
+        <div id="pembayaran" class="tab-content">
+            <div class="payment-card-container">
+                <h2 class="section-title">Konfirmasi Pembayaran</h2>
                 
-                <div class="input-group">
-                    <label>Total Tagihan</label>
-                    <input type="text" class="booking-input" value="Rp 18.450.000" disabled style="background-color: #E9EAEE; cursor: not-allowed;">
+                <div class="payment-form-grid" style="grid-template-columns: 1fr 1fr;">
+                    <!-- Kolom 1: Informasi Tagihan -->
+                    <div class="form-column">
+                        <div class="input-group">
+                            <label>Booking ID (PNR)</label>
+                            <input type="text" class="booking-input" value="97CMS8" disabled style="background-color: #E9EAEE; cursor: not-allowed;">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>Total Tagihan</label>
+                            <input type="text" class="booking-input" value="Rp 18.450.000" disabled style="background-color: #E9EAEE; cursor: not-allowed;">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Transfer ke Bank *</label>
+                            <select class="booking-input">
+                                <option>Pilih Bank Tujuan</option>
+                                <option>BCA - 1234567890 (a.n TicketPedia)</option>
+                                <option>Mandiri - 0987654321 (a.n TicketPedia)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Kolom 2: Detail Konfirmasi -->
+                    <div class="form-column">
+                        <div class="input-group">
+                            <label>Nama Pengirim / Rekening Asal *</label>
+                            <input type="text" class="booking-input" placeholder="Masukkan nama pemilik rekening">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Tanggal Transfer *</label>
+                            <input type="date" class="booking-input">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Bukti Pembayaran (.jpg, .pdf) *</label>
+                            <input type="file" class="file-input" accept=".jpg,.pdf">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="input-group">
-                    <label>Transfer ke Bank *</label>
-                    <select class="booking-input">
-                        <option>Pilih Bank Tujuan</option>
-                        <option>BCA - 1234567890 (a.n TicketPedia)</option>
-                        <option>Mandiri - 0987654321 (a.n TicketPedia)</option>
-                    </select>
+                <div class="payment-footer">
+                    <button class="btn-submit-payment" onclick="submitPayment()">Kirim Konfirmasi</button>
                 </div>
             </div>
-
-            <!-- Kolom 2: Detail Konfirmasi -->
-            <div class="form-column">
-                <div class="input-group">
-                    <label>Nama Pengirim / Rekening Asal *</label>
-                    <input type="text" class="booking-input" placeholder="Masukkan nama pemilik rekening">
-                </div>
-
-                <div class="input-group">
-                    <label>Tanggal Transfer *</label>
-                    <input type="date" class="booking-input">
-                </div>
-
-                <div class="input-group">
-                    <label>Bukti Pembayaran (.jpg, .pdf) *</label>
-                    <input type="file" class="file-input" accept=".jpg,.pdf">
-                </div>
-            </div>
-
         </div>
+    </main>
 
-        <div class="payment-footer">
-            <button class="btn-submit-payment" onclick="submitPayment()">Kirim Konfirmasi</button>
-        </div>
-    </div>
-</div>
+    <!-- PocketBase Session & UI Script -->
+    <script type="module">
+        import { pb } from '../src/pocketbase';
 
-    <script>
+        // Check if user is logged in
+        if (pb.authStore.isValid && pb.authStore.model) {
+            const user = pb.authStore.model;
+            
+            // Populate nav profile info dynamically
+            const usernameEl = document.querySelector('#navUsername');
+            const emailEl = document.querySelector('#navEmail');
+
+            if (usernameEl) usernameEl.textContent = user.username || 'User';
+            if (emailEl) emailEl.textContent = user.email || '';
+        } else {
+            // Redirect to login if unauthenticated
+            window.location.href = 'login.html';
+        }
+
         // Tab switching logic
         const tabs = document.querySelectorAll('.tab-link');
         const contents = document.querySelectorAll('.tab-content');
@@ -322,7 +280,7 @@
         });
 
         // Toggle Booking Form
-        function toggleBooking(button) {
+        window.toggleBooking = function(button) {
             const wrapper = button.closest('.ticket-wrapper');
             wrapper.classList.toggle('active-booking');
             
@@ -334,8 +292,12 @@
         }
 
         // Proceed to payment handler
-        function goToPayment() {
+        window.goToPayment = function() {
             alert("Data penumpang berhasil disimpan! Mengarahkan ke halaman Pembayaran...");
+        }
+
+        window.submitPayment = function() {
+            alert("Konfirmasi pembayaran berhasil dikirim!");
         }
     </script>
 </body>

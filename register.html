@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="log.css">
 </head>
 <body>
+    <div class="left-panel-bg">
+        <div class="left-content">
+            <span class="left-badge">*</span>
+            <img src="assets/ticketpedia_image.png" alt="">
+            <div class="left-text-block">
+                <p class="left-subtitle">buat sebuah akun.</p>
+                <h2 class="left-title">Masuk dengan akun Anda untuk mengelola reservasi dan riwayat tiket penerbangan.</h2>
+                <div class="left-line"></div>
+            </div>
+        </div>
+    </div>
+
     <div class="right-panel">
         <div class="brand-header">
             <div class="title">
@@ -19,7 +31,7 @@
 
         <form id="registerForm">
             <div class="form-group" style="margin-bottom: 20px;">
-                <label for="username">Username</label>
+                <label for="username">username</label>
                 <input type="text" id="username" class="form-control" placeholder="Panca Admin">
             </div>
 
@@ -37,11 +49,10 @@
         </form>
         
         <div class="footer-text" style="margin-top: 30px; text-align: center; padding-left: 0;">
-            Sudah punya akun? <a href="login_page.html">Login</a>
+            Sudah punya akun? <a href="login.html">Login</a>
         </div>
     </div>
 
-    <!-- Include the PocketBase browser SDK CDN -->
     <script type="module" src="/src/register.ts"></script>
 </body>
 </html>
