@@ -67,8 +67,8 @@ function renderFlights(flightsToRender: any[]) {
     }
 
     flightsToRender.forEach((flight: any) => {
-        const basePrice = Number(flight.jual);
-        const markupPrice = Number(flight.markup || 0);
+        const basePrice = Number(flight.jual) || 0;
+        const markupPrice = Number(flight.markup) || 0;
         const finalPrice = (basePrice + markupPrice) * 1000;
         
         const formattedPrice = finalPrice.toLocaleString('id-ID');
