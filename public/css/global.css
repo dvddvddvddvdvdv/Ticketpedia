@@ -48,7 +48,6 @@ body {
 
 /* --- TOP NAVIGATION --- */
 .top-nav {
-    position: fixed;
     top: var(--spacing);
     
     left: calc(var(--sidebar-width) + var(--spacing) * 2);
