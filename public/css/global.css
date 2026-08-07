@@ -48,6 +48,7 @@ body {
 
 /* --- TOP NAVIGATION --- */
 .top-nav {
+    position: fixed;
     top: var(--spacing);
     
     left: calc(var(--sidebar-width) + var(--spacing) * 2);
@@ -56,6 +57,7 @@ body {
     height: var(--top-nav-height);
     background-color: #F6F7F8;
     border-radius: 10px;
+    z-index: 9999;
 }
 
 main {
