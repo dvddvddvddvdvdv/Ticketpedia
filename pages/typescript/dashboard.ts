@@ -67,7 +67,11 @@ function renderFlights(flightsToRender: any[]) {
     }
 
     flightsToRender.forEach((flight: any) => {
-        const formattedPrice = Number(flight.jual * 1000).toLocaleString('id-ID');
+        const basePrice = Number(flight.jual);
+        const markupPrice = Number(flight.markup || 0);
+        const finalPrice = (basePrice + markupPrice) * 1000;
+        
+        const formattedPrice = finalPrice.toLocaleString('id-ID');
 
         // Parse rute1 (e.g. "CGKJED" -> "CGK (Jakarta) → JED (Jeddah)")
         const parseRoute = (routeStr: string) => {
@@ -91,7 +95,7 @@ function renderFlights(flightsToRender: any[]) {
                         <div class="flight-leg">
                             <div class="route">Pergi: ${parseRoute(flight.rute1)}</div>
                             <div class="time-details">
-                                <span><img src="assets/icon/calender-icon.png" alt=""> ${flight.dot}</span> 
+                                <span><img src="assets/icon/calender-icon.png" alt=""> ${flight.dot}</span>
                                 <span class="divider">|</span> 
                                 <span>${flight.time1}</span> 
                                 <span class="divider">|</span> 

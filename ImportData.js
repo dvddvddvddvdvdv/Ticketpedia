@@ -1,52 +1,62 @@
 import fs from 'fs';
 import PocketBase from 'pocketbase';
 
-// 1. Initialize PocketBase
 const pb = new PocketBase('https://db.zizazu.id');
 
-// 2. Read the JSON file
 const rawData = fs.readFileSync('flights_data.json', 'utf-8');
 const flights = JSON.parse(rawData);
 
+// Helper function to convert Excel serial number to a readable date (e.g., "06 Sep")
+function convertExcelDate(serial) {
+    const num = Number(serial);
+    if (!num || isNaN(num)) return serial;
+    const date = new Date(Math.round((num - 25569) * 86400 * 1000));
+    return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 async function importFlights() {
-    // Authenticate as the Admin
     await pb.collection('_superusers').authWithPassword('admin@ticketpedia.com', 'password123');
     
-    // Filter out those empty rows at the bottom of your JSON
     const validFlights = flights.filter(f => f.ROUTE);
     console.log(`Starting import of ${validFlights.length} tickets...`);
 
     for (const rawFlight of validFlights) {
-        // Map the uppercase/spaced Excel keys to lowercase PocketBase keys
+        const startingRouteCode = rawFlight['RUTE 1'];     
+
         const pbData = {
-            day: rawFlight['DAY'],
+            // Convert the raw number to a clean text date
+            day: convertExcelDate(rawFlight['DAY']),
+            
             prog: rawFlight['PROG'],
-            route: rawFlight['ROUTE'],
+            rout: rawFlight['ROUTE'] || 'JEDJED', 
+            short_route: startingRouteCode, 
+            rute1: rawFlight['RUTE 1'],
+            rute2: rawFlight['RUTE 1_1'], 
             dot: rawFlight['DOT'],
             flight1: rawFlight['FLIGHT 1'],
-            rute1: rawFlight['RUTE 1'],
             time1: rawFlight['TIME 1'],
             dot_turn: rawFlight['DOT TURN'],
             flight2: rawFlight['FLIGHT 2'],
-            rute2: rawFlight['RUTE 1_1'], // Maps RUTE 1_1 to rute2
             time2: rawFlight['TIME 2'],
+            hk2: rawFlight['HK2'] || '',
             hk: rawFlight['HK'],
             jual: rawFlight['JUAL'],
             beli: rawFlight['BELI'],
             vendor: rawFlight['VENDOR'],
-            // If it says "SOLD" in Excel, mark it sold, otherwise make it available
+            total: (rawFlight['JUAL'] || 0) - (rawFlight['BELI'] || 0), 
+            markup: 0, 
             status: rawFlight['SOLD'] === 'SOLD' ? 'sold' : 'available' 
         };
 
         try {
             await pb.collection('flights').create(pbData);
-            console.log(`Success: Added route ${pbData.rute1} -> ${pbData.rute2}`);
+            console.log(`Success: Added route ${pbData.short_route}`);
         } catch (error) {
             console.error(`Failed to add flight:`, error.message);
         }
     }
     
-    console.log('Import complete! Check your PocketBase dashboard.');
+    console.log('Import complete!');
 }
 
 importFlights();
