@@ -88,7 +88,7 @@ function renderFlights(flightsToRender: any[]) {
             <div class="ticket-wrapper">
                 <div class="ticket-card">
                     <div class="airline-info">
-                        <img src="assets/Airlines/${flight.vendor}.png" alt="${flight.vendor}" onerror="this.src='assets/Airlines/Garuda.png'">
+                        <img src="assets/Airlines/${flight.vendor}.png" alt="${flight.vendor}" onerror="this.src='Airlines/Garuda.png'">
                     </div>
 
                     <div class="flight-details">
