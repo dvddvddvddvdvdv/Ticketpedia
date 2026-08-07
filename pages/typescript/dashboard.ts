@@ -97,22 +97,22 @@ function renderFlights(flightsToRender: any[]) {
                         <div class="flight-leg">
                             <div class="route">Pergi: ${parseRoute(flight.rute1)}</div>
                             <div class="time-details">
-                                <span><img src="assets/icon/calender-icon.png" alt=""> ${flight.dot}</span>
+                                <span><img src="/icon/calender-icon.png" alt=""> ${flight.dot}</span>
                                 <span class="divider">|</span> 
                                 <span>${flight.time1}</span> 
                                 <span class="divider">|</span> 
-                                <span><img src="assets/icon/time-icon.png" alt=""> ${flight.flight1}</span>
+                                <span><img src="/icon/time-icon.png" alt=""> ${flight.flight1}</span>
                             </div>
                         </div>
 
                         <div class="flight-leg">
                             <div class="route">Pulang: ${parseRoute(flight.rute2)}</div>
                             <div class="time-details">
-                                <span><img src="assets/icon/plane-icon.png" alt=""> ${flight.dot_turn}</span> 
+                                <span><img src="/icon/plane-icon.png" alt=""> ${flight.dot_turn}</span> 
                                 <span class="divider">|</span> 
                                 <span>${flight.time2}</span> 
                                 <span class="divider">|</span> 
-                                <span><img src="assets/icon/time-icon.png" alt=""> ${flight.flight2}</span>
+                                <span><img src="/icon/time-icon.png" alt=""> ${flight.flight2}</span>
                             </div>
                         </div>
                     </div>
