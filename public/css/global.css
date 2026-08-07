@@ -6,23 +6,26 @@
 }
 
 /* --- LOAD SF COMPACT ROUNDED FONT --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Load SF Pro via Local Files (ensure these are in your fonts folder) */
 @font-face {
-    font-family: 'SF Compact Rounded';
-    src: url('../fonts/SF-Compact-Rounded-Regular.otf') format('opentype');
+    font-family: 'SF Pro Display';
+    src: url('../fonts/SF-Pro-Display-Regular.otf') format('opentype');
     font-weight: 400; 
     font-style: normal;
 }
 
 @font-face {
-    font-family: 'SF Compact Rounded';
-    src: url('../fonts/SF-Compact-Rounded-Bold.otf') format('opentype');
+    font-family: 'SF Pro Display';
+    src: url('../fonts/SF-Pro-Display-Bold.otf') format('opentype');
     font-weight: 700; 
     font-style: normal;
 }
 
 body {
     background-color: #E9EAEE !important;
-    font-family: 'SF Compact Rounded', system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif; 
 }
 
 :root {

@@ -75,116 +75,7 @@
             </div>
 
             <div class="ticket-list">
-                <!-- TICKET WRAPPER 1 -->
-                <div class="ticket-wrapper">
-                    <div class="ticket-card">
-                        <div class="airline-info">
-                            <img src="assets/Airlines/Garuda.png" alt="Garuda Indonesia">
-                        </div>
-
-                        <div class="flight-details">
-                            <div class="flight-leg">
-                                <div class="route">Pergi: CGK (Jakarta) &rarr; JED (Jeddah)</div>
-                                <div class="time-details">
-                                    <span><img src="assets/icon/calender-icon.png" alt=""> 06 Sep</span> <span class="divider">|</span> <span>00:40-06:15</span> <span class="divider">|</span> <span><img src="assets/icon/time-icon.png" alt=""> SV827</span>
-                                </div>
-                            </div>
-
-                            <div class="flight-leg">
-                                <div class="route">Pulang: JED (Jeddah) &rarr; CGK (Jakarta)</div>
-                                <div class="time-details">
-                                    <span><img src="assets/icon/plane-icon.png" alt=""> 06 Sep</span> <span class="divider">|</span> <span>08:40-22:45</span> <span class="divider">|</span> <span><img src="assets/icon/time-icon.png" alt=""> SV827</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="price-container">
-                            <div class="duration">Durasi: 9 Hari</div>
-                            <div class="price">Rp 18.450.000</div>
-                        </div>
-
-                        <div class="action-container">
-                            <button class="btn-pilih" onclick="toggleBooking(this)">Pilih Tiket</button>
-                        </div>
-                    </div>
-
-                    <!-- EXPANDABLE BOOKING FORM -->
-                    <div class="booking-form">
-                        <h3 class="booking-title">Detail Penumpang</h3>
-                        
-                        <div class="form-row">
-                            <div class="input-group"></div>
-                            <div class="input-group" style="flex-grow: 1;">
-                                <label>Nama Lengkap (Sesuai KTP/Paspor)</label>
-                                <input type="text" class="booking-input" placeholder="Masukkan nama lengkap">
-                            </div>
-                            <div class="input-group" style="flex-grow: 1;">
-                                <label>Nomor Identitas</label>
-                                <input type="text" class="booking-input" placeholder="NIK / No. Paspor">
-                            </div>
-                        </div>
-
-                        <div class="booking-footer">
-                            <div class="total-price">
-                                Total Tagihan: <span>Rp 18.450.000</span>
-                            </div>
-                            <button class="btn-lanjut" onclick="goToPayment()">Lanjut ke Pembayaran</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="aktif" class="tab-content">
-            <div class="active-ticket-grid">
-                <!-- SINGLE ACTIVE TICKET CARD -->
-                <div class="active-ticket-card">
-                    <div class="ticket-main-info">
-                        <div class="airline-column">
-                            <img src="assets/Airlines/Garuda.png" alt="Garuda Indonesia">
-                        </div>
-
-                        <div class="flight-info-column">
-                            <div class="route-title">Jakarta (CGK) &rarr; Bali (DPS)</div>
-                            <div class="flight-detail-row"><span><img src="assets/icon/calender-icon.png" alt=""></span> 12 Agustus 2026</div>
-                            <div class="flight-detail-row"><span><img src="assets/icon/time-icon.png" alt=""></span> 08.15 - 11.05 WIB</div>
-                            <div class="flight-detail-row"><span><img src="assets/icon/plane-icon.png" alt=""></span> GA-412</div>
-                            <div class="flight-detail-row"><span><img src="assets/icon/name-icon.png" alt=""></span> Caesar Ibrahim</div>
-                        </div>
-
-                        <div class="booking-id-column">
-                            <div class="status-badge">
-                                <span class="status-dot"></span> Siap Check-in
-                            </div>
-                            <div class="meta-block">
-                                <span class="meta-label">Booking ID</span>
-                                <span class="meta-value">GA8294</span>
-                            </div>
-                            <div class="meta-grid">
-                                <div>
-                                    <span class="meta-label">Gate</span>
-                                    <span class="meta-value">A12</span>
-                                </div>
-                                <div>
-                                    <span class="meta-label">Terminal</span>
-                                    <span class="meta-value">Terminal 3</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="qr-column">
-                            <img src="assets/qr1.png" alt="QR Code" class="qr-img">
-                            <a href="#" class="lihat-eticket">Lihat E-Ticket</a>
-                        </div>
-                    </div>
-
-                    <div class="ticket-actions">
-                        <button class="action-btn"><img src="assets/icon/detail-icon.png" alt=""> Lihat Detail</button>
-                        <button class="action-btn"><img src="assets/icon/ticket-small.png" alt=""> E-Ticket</button>
-                        <button class="action-btn success"><img src="assets/icon/check-icon.png" alt=""> Check-in Online</button>
-                        <button class="action-btn"><img src="assets/icon/plane-tracker.png" alt=""> Lacak Penerbangan</button>
-                    </div>
-                </div>
+               
             </div>
         </div>
         
@@ -219,7 +110,6 @@
                         </div>
                     </div>
 
-                    <!-- Kolom 2: Detail Konfirmasi -->
                     <div class="form-column">
                         <div class="input-group">
                             <label>Nama Pengirim / Rekening Asal *</label>
@@ -245,60 +135,6 @@
         </div>
     </main>
 
-    <!-- PocketBase Session & UI Script -->
-    <script type="module">
-        import { pb } from '../src/pocketbase';
-
-        // Check if user is logged in
-        if (pb.authStore.isValid && pb.authStore.model) {
-            const user = pb.authStore.model;
-            
-            // Populate nav profile info dynamically
-            const usernameEl = document.querySelector('#navUsername');
-            const emailEl = document.querySelector('#navEmail');
-
-            if (usernameEl) usernameEl.textContent = user.username || 'User';
-            if (emailEl) emailEl.textContent = user.email || '';
-        } else {
-            // Redirect to login if unauthenticated
-            window.location.href = '../login.html';
-        }
-
-        // Tab switching logic
-        const tabs = document.querySelectorAll('.tab-link');
-        const contents = document.querySelectorAll('.tab-content');
-
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-
-                contents.forEach(content => content.classList.remove('active-content'));
-                const targetId = tab.getAttribute('data-target');
-                document.getElementById(targetId).classList.add('active-content');
-            });
-        });
-
-        // Toggle Booking Form
-        window.toggleBooking = function(button) {
-            const wrapper = button.closest('.ticket-wrapper');
-            wrapper.classList.toggle('active-booking');
-            
-            if (wrapper.classList.contains('active-booking')) {
-                button.innerText = "Batalkan";
-            } else {
-                button.innerText = "Pilih Tiket";
-            }
-        }
-
-        // Proceed to payment handler
-        window.goToPayment = function() {
-            alert("Data penumpang berhasil disimpan! Mengarahkan ke halaman Pembayaran.");
-        }
-
-        window.submitPayment = function() {
-            alert("Konfirmasi pembayaran berhasil dikirim!");
-        }
-    </script>
+    <script type="module" src="./typescript/dashboard.ts"></script>
 </body>
 </html>
