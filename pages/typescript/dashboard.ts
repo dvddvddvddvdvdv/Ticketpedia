@@ -27,7 +27,7 @@ function formatExcelDate(serialNumber: number | string): string {
 
 let allFlights: any[] = []; // Store all records globally for filtering
 
-// 1. Check authentication
+// 1. Optional Authentication Check (Displays user if logged in, but doesn't block guests)
 if (pb.authStore.isValid && pb.authStore.model) {
     const user = pb.authStore.model;
     const usernameEl = document.querySelector('#navUsername');
@@ -35,11 +35,13 @@ if (pb.authStore.isValid && pb.authStore.model) {
 
     if (usernameEl) usernameEl.textContent = user.username || 'User';
     if (emailEl) emailEl.textContent = user.email || '';
-
-    loadFlights();
 } else {
-    window.location.href = '../login.html';
+    const usernameEl = document.querySelector('#navUsername');
+    if (usernameEl) usernameEl.textContent = 'Guest';
 }
+
+// Always load flights regardless of sign-in state
+loadFlights();
 
 // 2. Fetch all flights and setup search listener
 async function loadFlights() {
@@ -88,7 +90,7 @@ function renderFlights(flightsToRender: any[]) {
             <div class="ticket-wrapper">
                 <div class="ticket-card">
                 <div class="airline-info">
-                    <img src="../assets/Airlines/${flight.vendor}.png" alt="${flight.vendor}" onerror="this.src='../assets/Airlines/Garuda.png'">
+                    <img src="../assets/Airlines/${flight.vendor}.png" alt="${flight.vendor}" onerror="this.src='/Airlines/Garuda.png'">
                 </div>
 
                     <div class="flight-details">
@@ -156,7 +158,6 @@ function renderFlights(flightsToRender: any[]) {
 
 // 4. Real-time Search Filtering
 function setupSearchFilter() {
-    // Looks for an input with class 'search-bar' or type 'search'
     const searchInput = document.querySelector('input[placeholder*="Search"], .search-bar, input[type="text"]') as HTMLInputElement;
     if (!searchInput) return;
 
@@ -175,7 +176,6 @@ function setupSearchFilter() {
                    vendor.includes(query) || 
                    f1.includes(query) || 
                    f2.includes(query) ||
-                   // Allow searching full names like "jakarta" or "jeddah"
                    (query.includes('jakarta') && (r1.includes('cgk') || r2.includes('cgk'))) ||
                    (query.includes('jeddah') && (r1.includes('jed') || r2.includes('jed')));
         });
@@ -214,8 +214,6 @@ tabs.forEach(tab => {
         button.innerText = "Pilih Tiket";
     }
 };
-
-
 
 (window as any).goToPayment = function() {
     alert("Data penumpang berhasil disimpan! Mengarahkan ke halaman Pembayaran.");
