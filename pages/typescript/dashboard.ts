@@ -27,18 +27,58 @@ function formatExcelDate(serialNumber: number | string): string {
 
 let allFlights: any[] = []; // Store all records globally for filtering
 
-// 1. Optional Authentication Check (Displays user if logged in, but doesn't block guests)
-if (pb.authStore.isValid && pb.authStore.model) {
-    const user = pb.authStore.model;
-    const usernameEl = document.querySelector('#navUsername');
-    const emailEl = document.querySelector('#navEmail');
+// 1. Authentication & Role Check
+const isGuest = !pb.authStore.isValid;
+const user = pb.authStore.model;
+const isAdmin = pb.authStore.isAdmin; // True if logged in as a Superuser
 
+// Evaluate Vendor Status (Fallback to 'user' if undefined)
+const userRole = user ? (user.vendor || 'user') : null;
+const isStandardUser = userRole === 'user' && !isAdmin;
+const isPendingVendor = userRole === 'pending' && !isAdmin;
+const isApprovedVendor = userRole === 'approved' && !isAdmin;
+
+// Update UI based on auth state
+const usernameEl = document.querySelector('#navUsername');
+const emailEl = document.querySelector('#navEmail');
+
+if (!isGuest && user) {
     if (usernameEl) usernameEl.textContent = user.username || 'User';
     if (emailEl) emailEl.textContent = user.email || '';
+} else if (isAdmin) {
+    if (usernameEl) usernameEl.textContent = 'Admin';
+    if (emailEl) emailEl.textContent = pb.authStore.model?.email || '';
 } else {
-    const usernameEl = document.querySelector('#navUsername');
     if (usernameEl) usernameEl.textContent = 'Guest';
 }
+
+// 1.5 Handle Role-Based UI Visibility
+document.addEventListener('DOMContentLoaded', () => {
+    // Get button elements from your HTML (You will need to add these to your navbar/sidebar)
+    const loginBtn = document.querySelector('#loginBtn') as HTMLElement;
+    const applyVendorBtn = document.querySelector('#applyVendorBtn') as HTMLElement;
+    const pendingVendorStatus = document.querySelector('#pendingVendorStatus') as HTMLElement;
+    const vendorDashboardBtn = document.querySelector('#vendorDashboardBtn') as HTMLElement;
+    const adminPanelBtn = document.querySelector('#adminPanelBtn') as HTMLElement;
+
+    // Default: hide everything role-specific first
+    if (applyVendorBtn) applyVendorBtn.style.display = 'none';
+    if (pendingVendorStatus) pendingVendorStatus.style.display = 'none';
+    if (vendorDashboardBtn) vendorDashboardBtn.style.display = 'none';
+    if (adminPanelBtn) adminPanelBtn.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = isGuest ? 'block' : 'none';
+
+    // Reveal elements based on tier
+    if (isStandardUser) {
+        if (applyVendorBtn) applyVendorBtn.style.display = 'block';
+    } else if (isPendingVendor) {
+        if (pendingVendorStatus) pendingVendorStatus.style.display = 'block';
+    } else if (isApprovedVendor) {
+        if (vendorDashboardBtn) vendorDashboardBtn.style.display = 'block';
+    } else if (isAdmin) {
+        if (adminPanelBtn) adminPanelBtn.style.display = 'block';
+    }
+});
 
 // Always load flights regardless of sign-in state
 loadFlights();
@@ -101,7 +141,7 @@ function renderFlights(flightsToRender: any[]) {
                                 <span class="divider">|</span> 
                                 <span>${flight.time1}</span> 
                                 <span class="divider">|</span> 
-                                <span><img src="/icon/time-icon.png" alt=""> ${flight.flight1}</span>
+                                <span class="time-date"><img src="/icon/time-icon.png" alt=""> ${flight.flight1}</span>
                             </div>
                         </div>
 
@@ -112,7 +152,7 @@ function renderFlights(flightsToRender: any[]) {
                                 <span class="divider">|</span> 
                                 <span>${flight.time2}</span> 
                                 <span class="divider">|</span> 
-                                <span><img src="/icon/time-icon.png" alt=""> ${flight.flight2}</span>
+                                <span class="time-date"><img src="/icon/time-icon.png" alt=""> ${flight.flight2}</span>
                             </div>
                         </div>
                     </div>
@@ -204,6 +244,13 @@ tabs.forEach(tab => {
 
 // 6. Global Window Actions
 (window as any).toggleBooking = function(button: HTMLElement) {
+    // STOP GUESTS FROM BUYING
+    if (isGuest) {
+        alert("Silakan login atau daftar terlebih dahulu untuk memesan tiket.");
+        // window.location.href = '/login.html'; // Optional: redirect to login
+        return; 
+    }
+
     const wrapper = button.closest('.ticket-wrapper');
     if (!wrapper) return;
     wrapper.classList.toggle('active-booking');
@@ -221,4 +268,25 @@ tabs.forEach(tab => {
 
 (window as any).submitPayment = function() {
     alert("Konfirmasi pembayaran berhasil dikirim!");
+};
+
+// 7. Role Upgrade Actions
+(window as any).requestVendorStatus = async function() {
+    if (!user || isGuest) return;
+
+    try {
+        const confirmRequest = confirm("Apakah Anda yakin ingin mendaftar sebagai Vendor?");
+        if (!confirmRequest) return;
+
+        // Update their profile in PocketBase
+        await pb.collection('users').update(user.id, {
+            vendor: 'pending' 
+        });
+
+        alert("Permintaan berhasil dikirim! Menunggu persetujuan Admin.");
+        window.location.reload(); 
+    } catch (error) {
+        console.error("Gagal mengirim permintaan:", error);
+        alert("Terjadi kesalahan saat mendaftar vendor.");
+    }
 };

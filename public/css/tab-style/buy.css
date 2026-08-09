@@ -6,7 +6,7 @@
 .ticket-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 5px;
 }
 
 .ticket-card {
@@ -93,11 +93,15 @@
 .time-details {
     font-size: 16px;
     color: #222;
-    font-weight: 700;
+    font-weight: 500;
     display: flex;
     align-items: center;
     gap: 6px;
     white-space: nowrap; /* Prevents times from wrapping */
+}
+
+.time-date {
+    font-weight: 750;
 }
 
 /* --- TAB MENU CONTAINER --- */
@@ -174,7 +178,7 @@
     width: auto; /* CRITICAL: Replaced your 340px with auto */
     min-width: 170px;
     flex-shrink: 0;
-    border-left: 1px solid #B0B5BD; 
+    border-left: 1px solid #f1efef; 
 }
 
 
