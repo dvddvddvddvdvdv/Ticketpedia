@@ -1,14 +1,6 @@
-/* RESET CSS */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* --- LOAD SF COMPACT ROUNDED FONT --- */
+/* --- LOAD FONTS --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Load SF Pro via Local Files (ensure these are in your fonts folder) */
 @font-face {
     font-family: 'SF Pro Display';
     src: url('../fonts/SF-Pro-Display-Regular.otf') format('opentype');
@@ -28,32 +20,31 @@ body {
     font-family: 'Inter', system-ui, sans-serif; 
 }
 
+/* --- LAYOUT VARIABLES --- */
 :root {
     --spacing: 12px;          
     --sidebar-width: 210px;
     --top-nav-height: 120px; 
 }
 
+/* --- CORE LAYOUT STRUCTURE --- */
 .nav {
     position: fixed;
     top: var(--spacing);
     left: var(--spacing);
     bottom: var(--spacing);
-    
     width: var(--sidebar-width);
     padding-top: 40px;
     background-color: #F6F7F8;
     border-radius: 10px;
 }
 
-/* --- TOP NAVIGATION --- */
 .top-nav {
-    position: fixed;
+    /* CHANGED: Absolute positioning allows it to scroll away with the page content */
+    position: absolute; 
     top: var(--spacing);
-    
     left: calc(var(--sidebar-width) + var(--spacing) * 2);
     right: var(--spacing);
-    
     height: var(--top-nav-height);
     background-color: #F6F7F8;
     border-radius: 10px;
@@ -66,33 +57,17 @@ main {
     padding-right: var(--spacing);
 }
 
-.icon {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
+/* --- CUSTOM COMPONENT SIZING & COLORS --- */
 .title {
     padding-bottom: 30px;
     width: 80%;
 }
 
-.menu {
-    padding-left: 20px;
-    padding-bottom: 20px;
-    width: 100%;
-}
-
-.menu img{
+.menu img {
     width: 88%;
 }
 
 .selection {
-    position: relative; 
-    width: 100%;
-    display: flex;
-    align-items: center;
     cursor: pointer;
     padding: 2px 0; 
 }
@@ -106,59 +81,24 @@ main {
     width: 80px; 
 }
 
-/* --- TOP ICON CONTAINER --- */
-.top-icon {
-    display: flex;
-    align-items: center;
-    height: 100%; /* Fills the 120px height to perfectly center items */
-    padding: 0 20px; /* Adds breathing room on the left and right */
+.top-icon > a {
+    margin-right: 20px;
 }
 
-/* The invisible spacer that pushes the profile to the right */
-.top-icon .diva {
-    flex-grow: 1; 
+.top-icon > a img {
+    width: 60px;
 }
 
-/* Target just the notification and email icons */
-.top-icon a {
-    display: flex;
-    align-items: center;
-    margin-right: 20px; /* Space between icons */
-}
-
-.top-icon a img {
-    width: 45px; /* Adjusted from 60px so they don't look massive */
-}
-
-/* --- USER PROFILE SECTION --- */
 .user-profile {
-    display: flex;
-    align-items: center;
-    gap: 15px; 
-    border-left: 2px solid #E9EAEE; 
-    padding-left: 20px; 
-}
-
-.user-profile a {
-    margin-right: 0;
+    border-color: #E9EAEE !important; /* Overrides Bootstrap's default gray border */
 }
 
 .user-profile a img {
     width: 60px;
-    border-radius: 50%;
-}
-
-.divs {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    /* Removed padding-top: 10% */
 }
 
 .username {
     font-size: 2.5ch;
-    color: #000000;
-    font-weight: 700;
 }
 
 .Email-name {

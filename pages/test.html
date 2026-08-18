@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ticket Card Layouts (Lunas & Pending)</title>
+<style>
+    /* =========================================
+       Base Reset & Typography
+       ========================================= */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #E9ECEF;
+        padding: 40px;
+        display: flex;
+        gap: 24px;
+        justify-content: center;
+        flex-wrap: wrap; /* Allows cards to sit side-by-side or stack on small screens */
+    }
+
+    /* =========================================
+       Main Card Container
+       ========================================= */
+    .ticket-card {
+        display: flex;
+        background-color: #F6F7F9;
+        border-radius: 12px;
+        padding: 24px;
+        width: 100%;
+        max-width: 850px;
+        gap: 24px;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+    }
+
+    /* --- Column 1: Airline --- */
+    .tc-airline {
+        flex: 0 0 120px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    .tc-airline img {
+        width: 100%;
+        max-width: 100px;
+        height: auto;
+        object-fit: contain;
+    }
+
+    /* --- Column 2: Flight Details --- */
+    .tc-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .tc-route {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 16px;
+    }
+    .tc-meta-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .tc-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        color: #374151;
+    }
+    .tc-meta-item img {
+        width: 16px;
+        height: 16px;
+        color: #4B5563;
+    }
+    
+    /* Toggle Leg Button */
+    .tc-btn-leg {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        background: transparent;
+        border: 1px solid #D1D5DB;
+        border-radius: 999px; /* Rounded pill style */
+        font-size: 13px;
+        font-weight: 600;
+        color: #4338CA;
+        cursor: pointer;
+        width: fit-content;
+    }
+    .tc-btn-leg svg {
+        width: 14px;
+        height: 14px;
+        color: #4338CA;
+    }
+
+    /* --- Column 3: Divider --- */
+    .tc-divider {
+        width: 1px;
+        background-color: #E5E7EB;
+        margin: 10px 0;
+    }
+
+    /* =========================================
+       Right Section: Shared & Base
+       ========================================= */
+    .tc-booking {
+        flex: 1.1;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+    }
+    .tc-info-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .tc-label {
+        font-size: 12px;
+        color: #6B7280;
+    }
+    .tc-value {
+        font-size: 14px;
+        color: #111827;
+    }
+    .tc-price {
+        font-size: 18px;
+        font-weight: 700;
+        color: #111827;
+    }
+    .tc-duration {
+        font-size: 14px;
+        font-weight: 700;
+        color: #111827;
+        margin-top: 8px;
+    }
+
+    /* Shared Status Pill */
+    .tc-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .tc-status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+    }
+
+    /* =========================================
+       LUNAS Specific Layout
+       ========================================= */
+    .tc-booking-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .tc-booking-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: space-between;
+    }
+    .tc-payment {
+        font-size: 12px;
+        color: #9CA3AF;
+        margin-top: 2px;
+    }
+    .tc-status-lunas {
+        background-color: #E8F5E9;
+        color: #1B5E20;
+    }
+    .tc-status-lunas .tc-status-dot {
+        background-color: #4CAF50;
+    }
+    .tc-qr {
+        width: 76px;
+        height: 76px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+    .tc-btn-eticket {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #4338CA;
+        background: #FFFFFF;
+        border: 1px solid #4338CA;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 6px 12px;
+        cursor: pointer;
+    }
+
+    /* =========================================
+       PENDING Specific Layout
+       ========================================= */
+    .tc-booking-pending {
+        flex-direction: column; /* Stacks the rows vertically */
+    }
+    .tc-pending-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    .tc-text-right {
+        align-items: flex-end;
+        text-align: right;
+    }
+    .tc-countdown {
+        font-size: 28px; 
+        font-weight: 400;
+        color: #111827;
+        line-height: 1;
+        margin-top: 2px;
+    }
+    .tc-status-pending {
+        background-color: #FEF3C7;
+        color: #D97706;
+    }
+    .tc-status-pending .tc-status-dot {
+        background-color: #D97706;
+    }
+    .tc-btn-primary {
+        width: 100%;
+        padding: 12px;
+        background-color: #3283e7;
+        color: #FFFFFF;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 16px;
+        transition: background-color 0.2s;
+    }
+    .tc-btn-primary:hover {
+        background-color: #206ac7;
+    }
+</style>
+</head>
+<body>
+
+    <!-- ==========================================
+         CARD 1: LUNAS LAYOUT
+         ========================================== -->
+    <div class="ticket-card">
+        <!-- 1. Airline -->
+        <div class="tc-airline">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Garuda_Indonesia_logo.svg/1200px-Garuda_Indonesia_logo.svg.png" alt="Garuda Indonesia">
+        </div>
+
+        <!-- 2. Details -->
+        <div class="tc-details">
+            <h3 class="tc-route">Jakarta (CGK) &rarr; Bali (DPS)</h3>
+            <div class="tc-meta-list">
+                <div class="tc-meta-item">
+                    <img src="/icon/calender-icon.png" alt="">
+                    <span>12 Agustus 2026</span>
+                </div>
+                <div class="tc-meta-item">
+                    <img src="/icon/time-icon.png" alt="">
+                    <span>08.15 - 11.05 WIB</span>
+                </div>
+                <div class="tc-meta-item">
+                    <img src="/icon/plane-icon.png" alt="">
+                    <span>GA-412</span>
+                </div>
+                <div class="tc-meta-item">
+                    <img src="/icon/name-icon.png" alt="">
+                    <span>Caesar Ibrahim</span>
+                </div>
+            </div>
+            <button class="tc-btn-leg">
+                penerbangan pergi
+            </button>
+        </div>
+
+        <!-- 3. Divider -->
+        <div class="tc-divider"></div>
+
+        <!-- 4. Lunas Booking Info -->
+        <div class="tc-booking">
+            <div class="tc-booking-info">
+                <div class="tc-info-group">
+                    <span class="tc-label">Kode pemesanan</span>
+                    <span class="tc-value">TICKET-1rxms3aPt</span>
+                </div>
+                <div class="tc-info-group">
+                    <span class="tc-label">Total bayar</span>
+                    <span class="tc-price">Rp 34.800.8000</span>
+                </div>
+                <div class="tc-info-group">
+                    <span class="tc-duration">14 hari . 2 leg</span>
+                    <span class="tc-payment">Kartu kredit . 16 nov</span>
+                </div>
+            </div>
+            <div class="tc-booking-actions">
+                <div class="tc-status tc-status-lunas">
+                    <span class="tc-status-dot"></span> Lunas
+                </div>
+                <img class="tc-qr" src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png" alt="QR Code">
+                <button class="tc-btn-eticket">
+                    <svg width="14" height="14" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4 22V2H20V22H4ZM6 20H18V4H6V20ZM13 14H15V16H13V14ZM9 14H11V16H9V14ZM13 8H15V12H13V8ZM9 8H11V12H9V8Z"/></svg>
+                    Lihat E-Ticket
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         CARD 2: PENDING LAYOUT
+         ========================================== -->
+    <div class="ticket-card">
+        <!-- 1. Airline -->
+        <div class="tc-airline">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Garuda_Indonesia_logo.svg/1200px-Garuda_Indonesia_logo.svg.png" alt="Garuda Indonesia">
+        </div>
+
+
+        <!-- 2. Details -->
+        <div class="tc-details">
+            <h3 class="tc-route">Jakarta (CGK) &rarr; Bali (DPS)</h3>
+            <div class="tc-meta-list">
+                <div class="tc-meta-item">
+                    <img src="/icon/calender-icon.png" alt="">
+                    <span>12 Agustus 2026</span>
+                </div>
+                <div class="tc-meta-item">
+                    <img src="/icon/time-icon.png" alt="">
+                    <span>08.15 - 11.05 WIB</span>
+                </div>
+                <div class="tc-meta-item">
+                    <img src="/icon/plane-icon.png" alt="">
+                    <span>GA-412</span>
+                </div>
+                <div class="tc-meta-item">
+                    <img src="/icon/name-icon.png" alt="">
+                    <span>Caesar Ibrahim</span>
+                </div>
+            </div>
+            <button class="tc-btn-leg">
+                penerbangan pergi
+            </button>
+        </div>
+
+        <!-- 3. Divider -->
+        <div class="tc-divider"></div>
+
+        <!-- 4. Pending Booking Info 
+             *Notice the extra 'tc-booking-pending' class here* -->
+        <div class="tc-booking tc-booking-pending">
+            
+            <!-- Top Row -->
+            <div class="tc-pending-row">
+                <div class="tc-info-group">
+                    <span class="tc-label">Kode pemesanan</span>
+                    <span class="tc-value">TICKET-1rxms3aPt</span>
+                </div>
+                <div class="tc-info-group tc-text-right">
+                    <div class="tc-status tc-status-pending">
+                        <span class="tc-status-dot"></span> Pending pembayaran
+                    </div>
+                    <span class="tc-duration">14 hari . 2 leg</span>
+                </div>
+            </div>
+
+            <!-- Middle Row -->
+            <div class="tc-pending-row" style="margin-top: auto; padding-bottom: 8px; align-items: flex-end;">
+                <div class="tc-info-group">
+                    <span class="tc-label">sisa tagihan</span>
+                    <span class="tc-price">Rp 34.800.8000</span>
+                </div>
+                <div class="tc-info-group tc-text-right">
+                    <span class="tc-label">sisa waktu</span>
+                    <span class="tc-countdown">02:08:56</span>
+                </div>
+            </div>
+
+            <!-- Bottom Row (Action Button) -->
+            <button class="tc-btn-primary">Pelunasan tiket</button>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -74,10 +74,10 @@
 .flight-leg {
     display: flex;
     flex-direction: column;
-    text-align: left; /* Changed to left */
+    text-align: right; /* Changed to left */
     gap: 6px;
     min-width: 220px; 
-    padding: 0 120px; /* Adds breathing room on the sides */
+    padding: 0 100px; /* Adds breathing room on the sides */
 }
 
 .flight-leg:first-child {
@@ -139,8 +139,7 @@
 
 /* --- VERTICAL DIVIDERS --- */
 .tab-divider {
-    font-size: 16px;
-    font-weight: 100;
+    color: #9C9B9B;
     user-select: none;
 }
 

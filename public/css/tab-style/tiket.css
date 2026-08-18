@@ -1,0 +1,384 @@
+/* ============================================
+   Tiket Aktif — kartu pembookingan
+   Prefix .bk- supaya tidak bentrok dengan buy.css
+   ============================================ */
+
+.bk-header {
+    margin: 8px 0 20px;
+}
+
+.bk-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1B1B1F;
+    margin: 0 0 2px;
+}
+
+.bk-header p {
+    font-size: 14px;
+    color: #9A9AA5;
+    margin: 0;
+}
+
+/* ---------- Grid ---------- */
+
+.bk-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
+    gap: 16px;
+    align-items: center;
+}
+
+@media (max-width: 980px) {
+    .bk-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Kartu ---------- */
+
+.bk-card {
+    display: flex;
+    grid-template-columns: 108px minmax(0, 1fr) 1px minmax(0, 175px);
+    gap: 14px;
+    background: #FFFFFF;
+    border: 1px solid #e1e1e1;
+    border-radius: 14px;
+    padding: 16px 18px;
+    position: relative;
+}
+
+.bk-airline {
+    display: flex;
+    padding-right: 80px;
+    align-items: center;
+    justify-content: center;
+}
+
+.bk-airline img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.bk-divider {
+    background: #ECECF1;
+    width: 1px;
+    height: 100%;
+}
+
+/* ---------- Kolom detail ---------- */
+
+.bk-details {
+    border-right: 2px solid rgb(235, 235, 235);
+    padding-right: 20px;
+}
+
+.bk-route {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1B1B1F;
+    margin: 0 0 30px;
+}
+
+.bk-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 13px;
+    color: #3F3F46;
+    margin-bottom: 9px;
+}
+
+.bk-meta:last-child {
+    margin-bottom: 0;
+}
+
+.bk-meta img,
+.bk-meta svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    opacity: 0.75;
+}
+
+/* ---------- Toggle pergi / pulang ---------- */
+
+.bk-leg-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 70px;
+    padding: 10px 30px;
+    background: #F2F6FC;
+    border: 1px solid #879fbd;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #1567C8;
+    cursor: pointer;
+    width: fit-content;
+    transition: background 0.15s ease;
+}
+
+.bk-leg-toggle:hover {
+    background: #E4EDFA;
+}
+
+.bk-leg-toggle img,
+.bk-leg-toggle svg {
+    width: 13px;
+    height: 13px;
+    flex-shrink: 0;
+}
+
+.bk-leg-toggle .bk-leg-icon--return {
+    transform: scaleX(-1);
+}
+
+/* ---------- Kolom kanan ---------- */
+
+.bk-side {
+    display: flex;
+    flex-direction: column;
+    padding-left: 50px;
+    padding-top: 22px;
+}
+
+.bk-label {
+    font-size: 11px;
+    color: #9A9AA5;
+    margin: 0 0 2px;
+}
+
+.bk-value {
+    font-size: 13px;
+    color: #1B1B1F;
+    margin: 0 0 12px;
+    word-break: break-all;
+}
+
+.bk-amount {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1B1B1F;
+    margin: 0;
+}
+
+.bk-trip {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1B1B1F;
+    bottom: 100px;
+    margin: 0 0 2px;
+}
+
+.bk-paytype {
+    font-size: 11px;
+    color: #B4B4BE;
+    margin: 0;
+}
+
+/* ---------- Status pill ---------- */
+
+.bk-status {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.bk-status::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.bk-status--paid {
+    background: #E6F6EC;
+    color: #1E7D45;
+}
+
+.bk-status--pending {
+    background: #FDF0D5;
+    color: #A2670A;
+}
+
+.bk-status--failed {
+    background: #F2F2F5;
+    color: #6E6E78;
+}
+
+/* ---------- Countdown ---------- */
+
+.bk-countdown-wrap {
+    margin-top: auto;
+    text-align: right;
+}
+
+.bk-countdown-label {
+    font-size: 12px;
+    color: #6E6E78;
+    margin: 0 0 -2px;
+}
+
+.bk-countdown {
+    font-size: 24px;
+    font-weight: 500;
+    color: #1B1B1F;
+    letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
+    margin: 0;
+}
+
+.bk-countdown--urgent {
+    color: #C0392B;
+}
+
+/* ---------- Tombol bayar ---------- */
+
+.bk-pay {
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #3283e7;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.bk-pay:hover:not(:disabled) {
+    background: #10529F;
+}
+
+.bk-pay:active:not(:disabled) {
+    transform: scale(0.99);
+}
+
+.bk-pay:disabled {
+    background: #C7C7CF;
+    cursor: not-allowed;
+}
+
+.bk-pay--expired {
+    background: transparent;
+    color: #9A9AA5;
+    border: 1px solid #DCDCE3;
+}
+
+.bk-pay--expired:hover:not(:disabled) {
+    background: transparent;
+}
+
+/* ---------- E-ticket / QR ---------- */
+
+.bk-eticket {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.bk-qr {
+    width: 82px;
+    height: 82px;
+    border-radius: 4px;
+    background: #F2F2F5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #9A9AA5;
+    text-align: center;
+    padding: 6px;
+}
+
+.bk-eticket-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #1567C8;
+    background: #FFFFFF;
+    border: 1px solid #DCDCE3;
+    border-radius: 6px;
+    padding: 5px 9px;
+    cursor: pointer;
+}
+
+.bk-eticket-btn:disabled {
+    color: #B4B4BE;
+    cursor: not-allowed;
+}
+
+/* ---------- Empty & loading ---------- */
+
+.bk-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 48px 20px;
+    color: #9A9AA5;
+}
+
+.bk-empty h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #3F3F46;
+    margin: 0 0 6px;
+}
+
+.bk-empty p {
+    font-size: 14px;
+    margin: 0 0 16px;
+}
+
+.bk-empty button {
+    padding: 9px 18px;
+    background: #1567C8;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* ---------- Filter ---------- */
+
+.bk-filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.bk-filter {
+    padding: 6px 14px;
+    border: 1px solid #DCDCE3;
+    background: #FFFFFF;
+    border-radius: 999px;
+    font-size: 13px;
+    color: #3F3F46;
+    cursor: pointer;
+}
+
+.bk-filter.active {
+    background: #1567C8;
+    border-color: #1567C8;
+    color: #FFFFFF;
+}

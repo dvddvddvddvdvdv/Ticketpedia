@@ -2,45 +2,62 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>TicketPedia</title>
+    <title>TicketPedia - Tickets</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/css/tickets.css">
     <link rel="stylesheet" href="/css/global.css">
+
+    <script 
+      type="text/javascript" 
+      src="https://app.sandbox.midtrans.com/snap/snap.js" 
+      data-client-key="Mid-client-TZN0n1_GdU1AizSC">
+    </script>
 </head>
 <body>
-    <nav>
+     <nav>
         <div class="nav">
-            <div class="icon">
+            <div class="icon d-flex flex-column align-items-center gap-2">
                 <img class="title" src="assets/ticketpedia.png" alt="TicketPedia Logo">
-                <div class="menu">
+                
+                <div class="menu w-100 ps-3 pb-3">
                     <img src="assets/MENU.png" alt="Menu">
                 </div>
-                <!-- Navigation Items -->
-                <div class="selection">
-                    <div class="selected"></div>
+
+                <!-- Unselected Home -->
+                <div class="selection w-100 d-flex align-items-center">
                     <a href="dashboard.html"><img src="assets/Home.png" alt="Home"></a>
                 </div>
-                <div class="selection">
+                <!-- Unselected Settings -->
+                <div class="selection w-100 d-flex align-items-center">
                     <a href="Settings.html"><img src="assets/gear.png" alt="Settings"></a>
                 </div>
-                <div class="selection">
+                <!-- Unselected Profile -->
+                <div class="selection w-100 d-flex align-items-center">
                     <a href="Account.html"><img src="assets/profile.png" alt="Profile"></a>
                 </div>
-                <div class="selection">
+                <!-- SELECTED: Tickets -->
+                <div class="selection position-relative w-100 d-flex align-items-center">
+                    <div class="selected position-absolute start-0 top-50 translate-middle-y"></div>
                     <a href="tickets.html"><img src="assets/tickets_sel.png" alt="Tickets"></a>
                 </div>
             </div>
         </div>
+
         <div class="top-nav">
-            <div class="top-icon">
+            <div class="top-icon d-flex align-items-center h-100 px-4">
                 <img src="assets/logo.png" alt="">
-                <div class="diva"></div>
-                <a href="#"><img src="assets/Notif.png" alt=""></a>
-                <a href="#"><img src="assets/Email.png" alt=""></a>
-                <div class="user-profile">
-                    <a href="#"><img class="Profile_picture" src="assets/profiles/p1.png" alt=""></a>
-                    <div class="divs">
-                        <p id="navUsername" class="username">Loading...</p>
-                        <p id="navEmail" class="Email-name">...</p>
+                
+                <div class="diva flex-grow-1"></div>
+                <a href="../index.html" class="d-flex align-items-center"><img src="assets/Fpage.png" alt=""></a>
+                <a href="#" class="d-flex align-items-center"><img src="assets/Notif.png" alt=""></a>
+                <a href="#" class="d-flex align-items-center"><img src="assets/Email.png" alt=""></a>
+                
+                <div class="user-profile d-flex align-items-center gap-3 border-start border-2 ps-3">
+                    <a href="#"><img class="Profile_picture rounded-circle" src="assets/profiles/p1.png" alt=""></a>
+                    
+                    <div class="divs d-flex flex-column justify-content-center">
+                        <p id="navUsername" class="username fw-bold text-dark mb-0">Loading...</p>
+                        <p id="navEmail" class="Email-name mb-0">...</p>
                     </div>
                 </div>
             </div>
@@ -48,25 +65,18 @@
     </nav>
 
     <main>
-
+        <div class="user-UI">
+            <img src="assets/logo.png" alt="">
+            <p class="label">Bergabung menjadi vendor</p>
+            <p class="sub-text">Bergabunglah menjadi mitra resmi TicketPedia. Jual tiket pesawat,</p>
+            <p class="sub-text">umroh, dan kelola inventaris Anda ke ribuan pelanggan.</p>
+            <a href="../index.html" class="vendor-btn">Daftar Menjadi Vendor Sekarang</a>
+        </div>
+        <div class="vendor-page">
+            dsaddsa
+        </div>
     </main>
 
-
-    <script type="module">
-        import { pb } from '../src/pocketbase';
-
-        if (pb.authStore.isValid && pb.authStore.model) {
-            const user = pb.authStore.model;
-            
-            const usernameEl = document.querySelector('#navUsername');
-            const emailEl = document.querySelector('#navEmail');
-
-            if (usernameEl) usernameEl.textContent = user.username || 'User';
-            if (emailEl) emailEl.textContent = user.email || '';
-        } else {
-            window.location.href = '../login.html';
-        }
-    </script>
-
+    <script type="module" src="typescript/ticket.ts"></script>
 </body>
 </html>

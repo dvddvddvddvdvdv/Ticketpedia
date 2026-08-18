@@ -3,46 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <title>TicketPedia - Dashboard</title>
+    
+    <!-- Added Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/tab-style/buy.css">
+    <link rel="stylesheet" href="/css/tab-style/tiket.css">
+    <link rel="stylesheet" href="/css/cart-bar.css">
+
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="Mid-client-kUbYyZKkX2jWzTbF"></script>
 </head>
 <body>
     <nav>
         <div class="nav">
-            <div class="icon">
+            <div class="icon d-flex flex-column align-items-center gap-2">
                 <img class="title" src="assets/ticketpedia.png" alt="TicketPedia Logo">
-                <div class="menu">
+                
+                <!-- Added Bootstrap width and padding utilities -->
+                <div class="menu w-100 ps-3 pb-3">
                     <img src="assets/MENU.png" alt="Menu">
                 </div>
 
-                <div class="selection">
-                    <div class="selected"></div>
+                <div class="selection position-relative w-100 d-flex align-items-center">
+                    <div class="selected position-absolute start-0 top-50 translate-middle-y"></div>
                     <a href="dashboard.html"><img src="assets/Home_sel.png" alt="Home"></a>
                 </div>
-                <div class="selection">
+                <div class="selection w-100 d-flex align-items-center">
                     <a href="Settings.html"><img src="assets/gear.png" alt="Settings"></a>
                 </div>
-                <div class="selection">
+                <div class="selection w-100 d-flex align-items-center">
                     <a href="Account.html"><img src="assets/profile.png" alt="Profile"></a>
                 </div>
-                <div class="selection">
+                <div class="selection w-100 d-flex align-items-center">
                     <a href="tickets.html"><img src="assets/tickets.png" alt="Tickets"></a>
                 </div>
             </div>
         </div>
 
         <div class="top-nav">
-            <div class="top-icon">
+            <!-- Added Bootstrap flex, height, and padding utilities -->
+            <div class="top-icon d-flex align-items-center h-100 px-4">
                 <img src="assets/logo.png" alt="">
-                <div class="diva"></div>
-                <a href="#"><img src="assets/Notif.png" alt=""></a>
-                <a href="#"><img src="assets/Email.png" alt=""></a>
-                <div class="user-profile">
-                    <a href="#"><img class="Profile_picture" src="assets/profiles/p1.png" alt=""></a>
-                    <div class="divs">
-                        <p id="navUsername" class="username">Loading...</p>
-                        <p id="navEmail" class="Email-name">...</p>
+                
+                <!-- Added Bootstrap flex-grow to push items to the right -->
+                <div class="diva flex-grow-1"></div>
+                
+                <!-- Added Bootstrap flex utilities -->
+                 <a href="../index.html" class="d-flex align-items-center"><img src="assets/Fpage.png" alt=""></a>
+                <a href="test.html" class="d-flex align-items-center"><img src="assets/Notif.png" alt=""></a>
+                <a href="#" class="d-flex align-items-center"><img src="assets/Email.png" alt=""></a>
+                
+                <!-- Added Bootstrap flex, border-left, and gap utilities -->
+                <div class="user-profile d-flex align-items-center gap-3 border-start border-2 ps-3">
+                    <a href="#"><img class="Profile_picture rounded-circle" src="assets/profiles/p1.png" alt=""></a>
+                    
+                    <!-- Added Bootstrap flex column utilities -->
+                    <div class="divs d-flex flex-column justify-content-center">
+                        <p id="navUsername" class="username fw-bold text-dark mb-0">Loading...</p>
+                        <p id="navEmail" class="Email-name mb-0">...</p>
                     </div>
                 </div>
             </div>
@@ -54,7 +75,7 @@
             <ul class="tab-list">
                 <li class="tab-link active" data-target="pembelian">Pembelian ticket</li>
                 <li class="tab-divider">|</li>
-                <li class="tab-link" data-target="aktif">Tiket Aktif</li>
+                <li class="tab-link" data-target="aktif">booking ticket</li>
                 <li class="tab-divider">|</li>
                 <li class="tab-link" data-target="riwayat">Riwayat Pemesanan</li>
                 <li class="tab-divider">|</li>
@@ -64,21 +85,40 @@
 
         <!-- The Content Sections -->
         <div id="pembelian" class="tab-content active-content">
-            <div class="ticket-controls">
-                <input type="text" class="search-bar" placeholder="Search Bar">
-                <button class="filter-btn">
+            
+            <!-- Added Bootstrap flexbox, alignment, and border-radius utilities here -->
+            <div class="ticket-controls d-flex align-items-center">
+                <input type="text" class="search-bar border-0 rounded-pill shadow-none" placeholder="Search Bar">
+                
+                <button class="filter-btn border-0 rounded-pill d-flex align-items-center">
                     Filter 
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                 </button>
-                <button class="filter-tag">Direct</button>
-                <button class="filter-tag">Transit</button>
+                
+                <button class="filter-tag border-0 rounded-pill d-flex align-items-center">Direct</button>
+                <button class="filter-tag border-0 rounded-pill d-flex align-items-center">Transit</button>
             </div>
 
-            <div class="ticket-list">
-               
-            </div>
+            <div class="ticket-list"></div>
         </div>
+
         
+        <div id="aktif" class="tab-content">
+            <div class="bk-header">
+                <h2>Informasi Pembookingan</h2>
+                <p>semua ticket yang telah di book</p>
+            </div>
+
+            <div class="bk-filters">
+                <button class="bk-filter active" data-status="all">Semua</button>
+                <button class="bk-filter" data-status="pending">Menunggu pembayaran</button>
+                <button class="bk-filter" data-status="paid">Lunas</button>
+                <button class="bk-filter" data-status="failed">Kedaluwarsa</button>
+            </div>
+
+            <div class="bk-list"></div>
+        </div>
+
         <div id="riwayat" class="tab-content">
             <h2>Riwayat Pemesanan Content</h2>
         </div>
@@ -133,8 +173,10 @@
                 </div>
             </div>
         </div>
+        <div id="cart-bar"></div>
     </main>
 
     <script type="module" src="./typescript/dashboard.ts"></script>
+    <script type="module" src="./typescript/book.ts"></script>
 </body>
 </html>

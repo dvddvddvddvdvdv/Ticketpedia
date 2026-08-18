@@ -1,44 +1,101 @@
 import { pb } from '../../src/pocketbase';
 
+const API_BASE = 'https://db.zizazu.id';
+
 // Airport code to full city name mapping
 const cityNames: { [key: string]: string } = {
     'CGK': 'Jakarta (CGK)',
     'JED': 'Jeddah (Jeddah)',
     'MED': 'Medan (Medan)',
     'SUB': 'Surabaya (Surabaya)',
-    'JEDJED': 'Jeddah (Jeddah)' // fallback for custom routes
+    'JEDJED': 'Jeddah (Jeddah)'
 };
 
 function getCityName(code: string): string {
     return cityNames[code] || code;
 }
 
-// Converts raw Excel serial numbers (e.g., 46151) into readable dates (e.g., "06 Sep")
 function formatExcelDate(serialNumber: number | string): string {
     const serial = Number(serialNumber);
     if (!serial || isNaN(serial)) return String(serialNumber);
-    
-    // Convert Excel epoch to JS epoch
     const date = new Date(Math.round((serial - 25569) * 86400 * 1000));
-    
-    // Format output to Indonesian locale (e.g., "06 Sep")
     return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
 }
 
-let allFlights: any[] = []; // Store all records globally for filtering
+function esc(value: unknown): string {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
-// 1. Authentication & Role Check
+function parseRoute(routeStr: string): string {
+    if (!routeStr) return '';
+    if (routeStr.length === 6) {
+        return `${esc(getCityName(routeStr.slice(0, 3)))} &rarr; ${esc(getCityName(routeStr.slice(3, 6)))}`;
+    }
+    return esc(routeStr);
+}
+
+function formatRupiah(n: number): string {
+    return 'Rp ' + n.toLocaleString('id-ID');
+}
+
+let allFlights: any[] = [];
+
+/* ---------- Keranjang pesanan (belum dibayar) ---------- */
+
+interface CartItem {
+    flightId: string;
+    routeLabel: string;
+    passengerName: string;
+    price: number; // per orang, dalam rupiah
+}
+
+const cart = new Map<string, CartItem>(); // key: flightId
+
+function cartTotal(): number {
+    let sum = 0;
+    cart.forEach(item => (sum += item.price));
+    return sum;
+}
+
+function renderCartBar() {
+    const bar = document.querySelector('#cart-bar');
+    if (!bar) return;
+
+    if (cart.size === 0) {
+        bar.innerHTML = '';
+        (bar as HTMLElement).style.display = 'none';
+        return;
+    }
+
+    (bar as HTMLElement).style.display = 'flex';
+    bar.innerHTML = `
+        <div class="cart-info">
+            <strong>${cart.size}</strong> tiket dipilih &middot;
+            <span class="cart-total">${formatRupiah(cartTotal())}</span>
+        </div>
+        <div class="cart-actions">
+            <button class="btn-cart-clear" type="button">Kosongkan</button>
+            <button class="btn-cart-checkout" type="button">Pesan Tiket</button>
+        </div>
+    `;
+}
+
+/* ---------- Auth & role (unchanged) ---------- */
+
 const isGuest = !pb.authStore.isValid;
-const user = pb.authStore.model;
-const isAdmin = pb.authStore.isAdmin; // True if logged in as a Superuser
+const user = pb.authStore.record;
+const isAdmin = pb.authStore.isSuperuser;
 
-// Evaluate Vendor Status (Fallback to 'user' if undefined)
 const userRole = user ? (user.vendor || 'user') : null;
 const isStandardUser = userRole === 'user' && !isAdmin;
 const isPendingVendor = userRole === 'pending' && !isAdmin;
 const isApprovedVendor = userRole === 'approved' && !isAdmin;
 
-// Update UI based on auth state
 const usernameEl = document.querySelector('#navUsername');
 const emailEl = document.querySelector('#navEmail');
 
@@ -47,28 +104,24 @@ if (!isGuest && user) {
     if (emailEl) emailEl.textContent = user.email || '';
 } else if (isAdmin) {
     if (usernameEl) usernameEl.textContent = 'Admin';
-    if (emailEl) emailEl.textContent = pb.authStore.model?.email || '';
+    if (emailEl) emailEl.textContent = pb.authStore.record?.email || '';
 } else {
     if (usernameEl) usernameEl.textContent = 'Guest';
 }
 
-// 1.5 Handle Role-Based UI Visibility
-document.addEventListener('DOMContentLoaded', () => {
-    // Get button elements from your HTML (You will need to add these to your navbar/sidebar)
+function applyRoleVisibility() {
     const loginBtn = document.querySelector('#loginBtn') as HTMLElement;
     const applyVendorBtn = document.querySelector('#applyVendorBtn') as HTMLElement;
     const pendingVendorStatus = document.querySelector('#pendingVendorStatus') as HTMLElement;
     const vendorDashboardBtn = document.querySelector('#vendorDashboardBtn') as HTMLElement;
     const adminPanelBtn = document.querySelector('#adminPanelBtn') as HTMLElement;
 
-    // Default: hide everything role-specific first
     if (applyVendorBtn) applyVendorBtn.style.display = 'none';
     if (pendingVendorStatus) pendingVendorStatus.style.display = 'none';
     if (vendorDashboardBtn) vendorDashboardBtn.style.display = 'none';
     if (adminPanelBtn) adminPanelBtn.style.display = 'none';
     if (loginBtn) loginBtn.style.display = isGuest ? 'block' : 'none';
 
-    // Reveal elements based on tier
     if (isStandardUser) {
         if (applyVendorBtn) applyVendorBtn.style.display = 'block';
     } else if (isPendingVendor) {
@@ -78,17 +131,15 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (isAdmin) {
         if (adminPanelBtn) adminPanelBtn.style.display = 'block';
     }
-});
+}
+// Modul dieksekusi setelah DOM parsed (deferred), jadi jalankan langsung
+applyRoleVisibility();
 
-// Always load flights regardless of sign-in state
 loadFlights();
 
-// 2. Fetch all flights and setup search listener
 async function loadFlights() {
     try {
         allFlights = await pb.collection('flights').getFullList();
-        console.log("Fetched flights from PocketBase:", allFlights);
-        
         renderFlights(allFlights);
         setupSearchFilter();
     } catch (error) {
@@ -96,107 +147,100 @@ async function loadFlights() {
     }
 }
 
-// 3. Render flights to the DOM
 function renderFlights(flightsToRender: any[]) {
-    const ticketListContainer = document.querySelector('.ticket-list');
-    if (!ticketListContainer) return;
-    
-    ticketListContainer.innerHTML = ''; 
+    const container = document.querySelector('.ticket-list');
+    if (!container) return;
 
     if (flightsToRender.length === 0) {
-        ticketListContainer.innerHTML = `<div style="text-align: center; padding: 20px; color: #666;">Tidak ada penerbangan yang ditemukan.</div>`;
+        container.innerHTML = `
+            <div style="text-align:center; padding:20px; color:#666;">
+                Tidak ada penerbangan yang ditemukan.
+            </div>`;
         return;
     }
 
-    flightsToRender.forEach((flight: any) => {
+    container.innerHTML = flightsToRender.map((flight: any) => {
         const basePrice = Number(flight.jual) || 0;
         const markupPrice = Number(flight.markup) || 0;
         const finalPrice = (basePrice + markupPrice) * 1000;
-        
         const formattedPrice = finalPrice.toLocaleString('id-ID');
 
-        // Parse rute1 (e.g. "CGKJED" -> "CGK (Jakarta) → JED (Jeddah)")
-        const parseRoute = (routeStr: string) => {
-            if (!routeStr) return '';
-            if (routeStr.length === 6) {
-                const originCode = routeStr.slice(0, 3);
-                const destCode = routeStr.slice(3, 6);
-                return `${getCityName(originCode)} &rarr; ${getCityName(destCode)}`;
-            }
-            return routeStr;
-        };
+        const vendor = String(flight.vendor || 'Garuda');
+        const logoSrc = `/Airlines/${encodeURIComponent(vendor)}.png`;
+        const routeLabel = `${flight.rute1 ? parseRoute(flight.rute1).replace(/&rarr;|&amp;/g, ' - ') : ''}`;
+        const inCart = cart.has(flight.id);
 
-        const ticketHTML = `
-            <div class="ticket-wrapper">
-                <div class="ticket-card">
+        return `
+        <div class="ticket-wrapper" data-flight-id="${esc(flight.id)}" data-price="${finalPrice}">
+            <div class="ticket-card">
                 <div class="airline-info">
-                    <img src="../assets/Airlines/${flight.vendor}.png" alt="${flight.vendor}" onerror="this.src='/Airlines/Garuda.png'">
+                    <img src="${logoSrc}" alt="${esc(vendor)}"
+                         onerror="this.onerror=null; this.src='/Airlines/Garuda.png'">
                 </div>
 
-                    <div class="flight-details">
-                        <div class="flight-leg">
-                            <div class="route">Pergi: ${parseRoute(flight.rute1)}</div>
-                            <div class="time-details">
-                                <span><img src="/icon/calender-icon.png" alt=""> ${flight.dot}</span>
-                                <span class="divider">|</span> 
-                                <span>${flight.time1}</span> 
-                                <span class="divider">|</span> 
-                                <span class="time-date"><img src="/icon/time-icon.png" alt=""> ${flight.flight1}</span>
-                            </div>
-                        </div>
-
-                        <div class="flight-leg">
-                            <div class="route">Pulang: ${parseRoute(flight.rute2)}</div>
-                            <div class="time-details">
-                                <span><img src="/icon/plane-icon.png" alt=""> ${flight.dot_turn}</span> 
-                                <span class="divider">|</span> 
-                                <span>${flight.time2}</span> 
-                                <span class="divider">|</span> 
-                                <span class="time-date"><img src="/icon/time-icon.png" alt=""> ${flight.flight2}</span>
-                            </div>
+                <div class="flight-details">
+                    <div class="flight-leg">
+                        <div class="route">Pergi: ${parseRoute(flight.rute1)}</div>
+                        <div class="time-details">
+                            <span><img src="/icon/calender-icon.png" alt=""> ${esc(formatExcelDate(flight.dot))}</span>
+                            <span class="divider">|</span>
+                            <span>${esc(flight.time1)}</span>
+                            <span class="divider">|</span>
+                            <span class="time-date"><img src="/icon/time-icon.png" alt=""> ${esc(flight.flight1)}</span>
                         </div>
                     </div>
 
-                    <div class="price-container">
-                        <div class="duration">Durasi: ${flight.prog} (${flight.day})</div>
-                        <div class="price">Rp ${formattedPrice}</div>
-                    </div>
-
-                    <div class="action-container">
-                        <button class="btn-pilih" onclick="toggleBooking(this)">Pilih Tiket</button>
+                    <div class="flight-leg">
+                        <div class="route">Pulang: ${parseRoute(flight.rute2)}</div>
+                        <div class="time-details">
+                            <span><img src="/icon/plane-icon.png" alt=""> ${esc(formatExcelDate(flight.dot_turn))}</span>
+                            <span class="divider">|</span>
+                            <span>${esc(flight.time2)}</span>
+                            <span class="divider">|</span>
+                            <span class="time-date"><img src="/icon/time-icon.png" alt=""> ${esc(flight.flight2)}</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- EXPANDABLE BOOKING FORM -->
-                <div class="booking-form">
-                    <h3 class="booking-title">Detail Penumpang</h3>
-                    
-                    <div class="form-row">
-                        <div class="input-group" style="flex-grow: 1;">
-                            <label>Nama Lengkap (Sesuai KTP/Paspor)</label>
-                            <input type="text" class="booking-input" placeholder="Masukkan nama lengkap">
-                        </div>
-                        <div class="input-group" style="flex-grow: 1;">
-                            <label>Nomor Identitas</label>
-                            <input type="text" class="booking-input" placeholder="NIK / No. Paspor">
-                        </div>
-                    </div>
+                <div class="price-container">
+                    <div class="duration">Durasi: ${esc(flight.prog)} (${esc(flight.day)})</div>
+                    <div class="price">Rp ${formattedPrice}</div>
+                </div>
 
-                    <div class="booking-footer">
-                        <div class="total-price">
-                            Total Tagihan: <span>Rp ${formattedPrice}</span>
-                        </div>
-                        <button class="btn-lanjut" onclick="goToPayment()">Lanjut ke Pembayaran</button>
-                    </div>
+                <div class="action-container">
+                    <button class="btn-pilih" type="button">${inCart ? 'Batalkan' : 'Pilih Tiket'}</button>
                 </div>
             </div>
-        `;
-        ticketListContainer.insertAdjacentHTML('beforeend', ticketHTML);
-    });
 
+            <!-- FORM PENUMPANG — mengisi data sebelum ditambahkan ke pesanan -->
+            <div class="booking-form">
+                <h3 class="booking-title">Detail Penumpang</h3>
+
+                <div class="form-row">
+                    <div class="input-group" style="flex-grow:1;">
+                        <label>Nama Lengkap (Sesuai KTP/Paspor)</label>
+                        <input type="text" class="booking-input" data-field="name"
+                               placeholder="Masukkan nama lengkap" value="${esc(cart.get(flight.id)?.passengerName || '')}">
+                    </div>
+                </div>
+
+                <div class="booking-footer">
+                    <div class="total-price">
+                        Harga per orang: <span>Rp ${formattedPrice}</span>
+                    </div>
+                    <button class="btn-lanjut" type="button">${inCart ? 'Perbarui di Pesanan' : 'Tambah ke Pesanan'}</button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    // Buka kembali kartu yang sudah ada di keranjang, biar terlihat jelas
+    cart.forEach((_item, flightId) => {
+        const wrapper = container.querySelector(`[data-flight-id="${flightId}"]`);
+        wrapper?.classList.add('active-booking');
+    });
 }
 
-// 4. Real-time Search Filtering
 function setupSearchFilter() {
     const searchInput = document.querySelector('input[placeholder*="Search"], .search-bar, input[type="text"]') as HTMLInputElement;
     if (!searchInput) return;
@@ -211,10 +255,10 @@ function setupSearchFilter() {
             const f1 = (flight.flight1 || '').toLowerCase();
             const f2 = (flight.flight2 || '').toLowerCase();
 
-            return r1.includes(query) || 
-                   r2.includes(query) || 
-                   vendor.includes(query) || 
-                   f1.includes(query) || 
+            return r1.includes(query) ||
+                   r2.includes(query) ||
+                   vendor.includes(query) ||
+                   f1.includes(query) ||
                    f2.includes(query) ||
                    (query.includes('jakarta') && (r1.includes('cgk') || r2.includes('cgk'))) ||
                    (query.includes('jeddah') && (r1.includes('jed') || r2.includes('jed')));
@@ -224,7 +268,8 @@ function setupSearchFilter() {
     });
 }
 
-// 5. Tab switching logic
+/* ---------- Tab switching (unchanged) ---------- */
+
 const tabs = document.querySelectorAll('.tab-link');
 const contents = document.querySelectorAll('.tab-content');
 
@@ -232,7 +277,6 @@ tabs.forEach(tab => {
     tab.addEventListener('click', () => {
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-
         contents.forEach(content => content.classList.remove('active-content'));
         const targetId = tab.getAttribute('data-target');
         if (targetId) {
@@ -242,51 +286,151 @@ tabs.forEach(tab => {
     });
 });
 
-// 6. Global Window Actions
-(window as any).toggleBooking = function(button: HTMLElement) {
-    // STOP GUESTS FROM BUYING
-    if (isGuest) {
-        alert("Silakan login atau daftar terlebih dahulu untuk memesan tiket.");
-        // window.location.href = '/login.html'; // Optional: redirect to login
-        return; 
+/* ---------- Aksi kartu tiket (delegated) ---------- */
+
+document.addEventListener('click', async (ev) => {
+    const target = ev.target as HTMLElement;
+
+    // Toggle buka/tutup form penumpang
+    const pilihBtn = target.closest('.btn-pilih') as HTMLButtonElement | null;
+    if (pilihBtn) {
+        if (isGuest) {
+            alert('Silakan login atau daftar terlebih dahulu untuk memesan tiket.');
+            return;
+        }
+        const wrapper = pilihBtn.closest('.ticket-wrapper') as HTMLElement;
+        const flightId = wrapper?.dataset.flightId;
+
+        if (flightId && cart.has(flightId)) {
+            // Sudah ada di keranjang — klik ini membatalkannya
+            cart.delete(flightId);
+            renderFlights(allFlights);
+            renderCartBar();
+            return;
+        }
+
+        wrapper?.classList.toggle('active-booking');
+        pilihBtn.innerText = wrapper?.classList.contains('active-booking') ? 'Batalkan' : 'Pilih Tiket';
+        return;
     }
 
-    const wrapper = button.closest('.ticket-wrapper');
-    if (!wrapper) return;
-    wrapper.classList.toggle('active-booking');
-    
-    if (wrapper.classList.contains('active-booking')) {
-        button.innerText = "Batalkan";
-    } else {
-        button.innerText = "Pilih Tiket";
-    }
-};
+    // Tambah / perbarui item di keranjang
+    const lanjutBtn = target.closest('.btn-lanjut') as HTMLButtonElement | null;
+    if (lanjutBtn) {
+        const wrapper = lanjutBtn.closest('.ticket-wrapper') as HTMLElement;
+        if (!wrapper) return;
 
-(window as any).goToPayment = function() {
-    alert("Data penumpang berhasil disimpan! Mengarahkan ke halaman Pembayaran.");
-};
+        const flightId = wrapper.dataset.flightId!;
+        const price = Number(wrapper.dataset.price) || 0;
+        const nameInput = wrapper.querySelector('[data-field="name"]') as HTMLInputElement;
 
-(window as any).submitPayment = function() {
-    alert("Konfirmasi pembayaran berhasil dikirim!");
-};
+        const passengerName = nameInput?.value.trim() || '';
 
-// 7. Role Upgrade Actions
-(window as any).requestVendorStatus = async function() {
-    if (!user || isGuest) return;
+        if (!passengerName) {
+            alert('Silakan masukkan Nama Lengkap penumpang terlebih dahulu!');
+            nameInput?.focus();
+            return;
+        }
 
-    try {
-        const confirmRequest = confirm("Apakah Anda yakin ingin mendaftar sebagai Vendor?");
-        if (!confirmRequest) return;
-
-        // Update their profile in PocketBase
-        await pb.collection('users').update(user.id, {
-            vendor: 'pending' 
+        const routeEl = wrapper.querySelector('.route');
+        cart.set(flightId, {
+            flightId,
+            routeLabel: routeEl?.textContent || '',
+            passengerName,
+            price,
         });
 
-        alert("Permintaan berhasil dikirim! Menunggu persetujuan Admin.");
-        window.location.reload(); 
+        renderFlights(allFlights);
+        renderCartBar();
+        return;
+    }
+
+    // Kosongkan keranjang
+    if (target.closest('.btn-cart-clear')) {
+        if (cart.size === 0) return;
+        if (!confirm('Kosongkan semua tiket yang dipilih?')) return;
+        cart.clear();
+        renderFlights(allFlights);
+        renderCartBar();
+        return;
+    }
+
+    // Buat pesanan (pending) untuk semua item di keranjang
+    const checkoutBtn = target.closest('.btn-cart-checkout') as HTMLButtonElement | null;
+    if (checkoutBtn) {
+        if (!pb.authStore.isValid) {
+            alert('Sesi Anda telah berakhir. Silakan login kembali.');
+            window.location.href = '/login.html';
+            return;
+        }
+        if (cart.size === 0) return;
+
+        checkoutBtn.disabled = true;
+        checkoutBtn.textContent = 'Memproses…';
+
+        const items = Array.from(cart.values());
+        const failures: string[] = [];
+        let successCount = 0;
+
+        for (const item of items) {
+            try {
+                const res = await fetch(`${API_BASE}/api/midtrans/token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': pb.authStore.token,
+                    },
+                    // Endpoint ini membuat booking berstatus "pending" dan
+                    // mengembalikan Snap token — kita hanya memakai efek
+                    // sampingnya (record pending) dan sengaja TIDAK
+                    // memanggil snap.pay() di sini. Pembayaran dilakukan
+                    // belakangan lewat tombol "Bayar sekarang" di Tiket Aktif.
+                    body: JSON.stringify({
+                        flightId: item.flightId,
+                        name: item.passengerName,
+                    }),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.error || `Gagal (${res.status})`);
+                successCount++;
+            } catch (err) {
+                console.error('Gagal membuat pesanan:', item.flightId, err);
+                failures.push(item.routeLabel || item.flightId);
+            }
+        }
+
+        cart.clear();
+        renderCartBar();
+
+        if (failures.length > 0) {
+            alert(
+                `${successCount} pesanan berhasil dibuat.\n` +
+                `${failures.length} gagal:\n${failures.join('\n')}`
+            );
+        }
+
+        // Arahkan ke Tiket Aktif supaya pesanan pending langsung terlihat
+        const aktifTab = document.querySelector('[data-target="aktif"]') as HTMLElement;
+        aktifTab?.click();
+    }
+});
+
+/* ---------- Sisa fungsi lama ---------- */
+
+(window as any).submitPayment = function () {
+    alert('Konfirmasi pembayaran berhasil dikirim!');
+};
+
+(window as any).requestVendorStatus = async function () {
+    if (!user || isGuest) return;
+    try {
+        const confirmRequest = confirm('Apakah Anda yakin ingin mendaftar sebagai Vendor?');
+        if (!confirmRequest) return;
+        await pb.collection('users').update(user.id, { vendor: 'pending' });
+        alert('Permintaan berhasil dikirim! Menunggu persetujuan Admin.');
+        window.location.reload();
     } catch (error) {
-        console.error("Gagal mengirim permintaan:", error);
-        alert("Terjadi kesalahan saat mendaftar vendor.");
+        console.error('Gagal mengirim permintaan:', error);
+        alert('Terjadi kesalahan saat mendaftar vendor.');
     }
 };
