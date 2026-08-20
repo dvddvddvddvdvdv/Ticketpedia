@@ -1,6 +1,6 @@
 import { pb } from '../../src/pocketbase';
 
-const API_BASE = 'https://db.zizazu.id';
+const API_BASE = 'https://db.zizazu.my.id';
 
 // Airport code to full city name mapping
 const cityNames: { [key: string]: string } = {

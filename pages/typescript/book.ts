@@ -1,6 +1,6 @@
 import { pb } from '../../src/pocketbase';
 
-const API_BASE = 'https://db.zizazu.id';
+const API_BASE = 'https://db.zizazu.my.id';
 
 const cityNames: Record<string, string> = {
     CGK: 'Jakarta (CGK)',
@@ -118,50 +118,28 @@ function cardHTML(b: any): string {
     const f = b.expand?.flight || {};
     const status: string = b.status || 'pending';
     const vendor = String(f.vendor || 'Garuda');
-    const amountLabel = status === 'paid' ? 'Total bayar' : 'Sisa tagihan';
+    const tripLabel = `${esc(f.prog)} &middot; ${esc(f.day)}`;
 
-    const sideBottom = status === 'pending'
-        ? `<div class="bk-countdown-wrap" data-expiry="${esc(b.expiry_time || '')}">
-               <p class="bk-countdown-label">Sisa waktu</p>
-               <p class="bk-countdown">--:--:--</p>
-           </div>
-           <button class="bk-pay" data-order="${esc(b.order_id)}">Bayar sekarang</button>`
-        : status === 'paid'
-            ? `<div class="bk-eticket">
-                   <div class="bk-qr">E-tiket sedang diproses</div>
-                   <button class="bk-eticket-btn" disabled>Lihat e-tiket</button>
-               </div>`
-            : `<div class="bk-countdown-wrap">
-                   <p class="bk-countdown-label">Batas waktu habis</p>
-               </div>
-               <button class="bk-pay bk-pay--expired" disabled>Kedaluwarsa</button>`;
-
-    return `
-    <div class="bk-card" data-id="${esc(b.id)}">
-        <span class="bk-status bk-status--${esc(status)}">${esc(STATUS_TEXT[status] || status)}</span>
-
-        <div class="bk-airline">
-            <img src="/assets/Airlines/${encodeURIComponent(vendor)}.png" alt="${esc(vendor)}"
-                 onerror="this.onerror=null; this.src='/assets/Airlines/Garuda.png'">
-        </div>
-
+    const detailsBlock = `
         <div class="bk-details">
             <p class="bk-route">${parseRoute(f.rute1)}</p>
-            <div class="bk-meta">
-                <img src="/icon/calender-icon.png" alt="">
-                <span class="bk-leg-field" data-pergi="${formatDate(f.dot)}" data-pulang="${formatDate(f.dot_turn)}">${formatDate(f.dot)}</span>
-            </div>
-            <div class="bk-meta">
-                <img src="/icon/time-icon.png" alt="">
-                <span class="bk-leg-field" data-pergi="${esc(f.time1)} WIB" data-pulang="${esc(f.time2)} WIB">${esc(f.time1)} WIB</span>
-            </div>
-            <div class="bk-meta">
-                <img src="/icon/plane-icon.png" alt="">
-                <span class="bk-leg-field" data-pergi="${esc(f.flight1)}" data-pulang="${esc(f.flight2)}">${esc(f.flight1)}</span>
-            </div>
-            <div class="bk-meta">
-                <img src="/icon/person-icon.png" alt="">
-                <span>${esc(b.passenger_name)}</span>
+            <div class="bk-meta-list">
+                <div class="bk-meta">
+                    <img src="/icon/calender-icon.png" alt="">
+                    <span class="bk-leg-field" data-pergi="${formatDate(f.dot)}" data-pulang="${formatDate(f.dot_turn)}">${formatDate(f.dot)}</span>
+                </div>
+                <div class="bk-meta">
+                    <img src="/icon/time-icon.png" alt="">
+                    <span class="bk-leg-field" data-pergi="${esc(f.time1)} WIB" data-pulang="${esc(f.time2)} WIB">${esc(f.time1)} WIB</span>
+                </div>
+                <div class="bk-meta">
+                    <img src="/icon/plane-icon.png" alt="">
+                    <span class="bk-leg-field" data-pergi="${esc(f.flight1)}" data-pulang="${esc(f.flight2)}">${esc(f.flight1)}</span>
+                </div>
+                <div class="bk-meta">
+                    <img src="/icon/name-icon.png" alt="">
+                    <span>${esc(b.passenger_name)}</span>
+                </div>
             </div>
 
             <button class="bk-leg-toggle" type="button" data-leg="pergi">
@@ -170,19 +148,103 @@ function cardHTML(b: any): string {
             </button>
         </div>
 
-        <div class="bk-divider"></div>
+        <div class="bk-divider"></div>`;
 
-        <div class="bk-side">
-            <p class="bk-label">Kode pemesanan</p>
-            <p class="bk-value">${esc(b.order_id)}</p>
+    const airlineBlock = `
+        <div class="bk-airline">
+            <img src="/assets/Airlines/${encodeURIComponent(vendor)}.png" alt="${esc(vendor)}"
+                 onerror="this.onerror=null; this.src='/Airlines/Garuda.png'">
+        </div>`;
 
-            <p class="bk-label">${amountLabel}</p>
-            <p class="bk-amount">${formatRupiah(b.amount)}</p>
+    if (status === 'paid') {
+        return `
+        <div class="bk-card" data-id="${esc(b.id)}">
+            ${airlineBlock}
+            ${detailsBlock}
 
-            <p class="bk-trip" style="margin-top:12px;">${esc(f.prog)} &middot; ${esc(f.day)}</p>
-            <p class="bk-paytype">${esc(b.payment_type || '—')}</p>
+            <div class="bk-booking">
+                <div class="bk-booking-info">
+                    <div class="bk-info-group">
+                        <span class="bk-label">Kode pemesanan</span>
+                        <span class="bk-value">${esc(b.order_id)}</span>
+                    </div>
+                    <div class="bk-info-group">
+                        <span class="bk-label">Total bayar</span>
+                        <span class="bk-price">${formatRupiah(b.amount)}</span>
+                    </div>
+                    <div class="bk-info-group">
+                        <span class="bk-trip">${tripLabel}</span>
+                        <span class="bk-payment">${esc(b.payment_type || '—')}</span>
+                    </div>
+                </div>
+                <div class="bk-booking-actions">
+                    <span class="bk-status bk-status--paid">${esc(STATUS_TEXT.paid)}</span>
+                    <div class="bk-qr">E-tiket sedang diproses</div>
+                    <button class="bk-eticket-btn" disabled>Lihat e-tiket</button>
+                </div>
+            </div>
+        </div>`;
+    }
 
-            ${sideBottom}
+    if (status === 'failed') {
+        return `
+        <div class="bk-card" data-id="${esc(b.id)}">
+            ${airlineBlock}
+            ${detailsBlock}
+
+            <div class="bk-booking bk-booking-pending">
+                <div class="bk-pending-row">
+                    <div class="bk-info-group">
+                        <span class="bk-label">Kode pemesanan</span>
+                        <span class="bk-value">${esc(b.order_id)}</span>
+                    </div>
+                    <div class="bk-info-group bk-text-right">
+                        <span class="bk-status bk-status--failed">${esc(STATUS_TEXT.failed)}</span>
+                        <span class="bk-trip">${tripLabel}</span>
+                    </div>
+                </div>
+                <div class="bk-pending-row bk-row-bottom">
+                    <div class="bk-info-group">
+                        <span class="bk-label">Sisa tagihan</span>
+                        <span class="bk-price">${formatRupiah(b.amount)}</span>
+                    </div>
+                    <div class="bk-info-group bk-text-right">
+                        <span class="bk-label">Batas waktu habis</span>
+                    </div>
+                </div>
+                <button class="bk-pay bk-pay--expired" disabled>Kedaluwarsa</button>
+            </div>
+        </div>`;
+    }
+
+    // pending
+    return `
+    <div class="bk-card" data-id="${esc(b.id)}">
+        ${airlineBlock}
+        ${detailsBlock}
+
+        <div class="bk-booking bk-booking-pending">
+            <div class="bk-pending-row">
+                <div class="bk-info-group">
+                    <span class="bk-label">Kode pemesanan</span>
+                    <span class="bk-value">${esc(b.order_id)}</span>
+                </div>
+                <div class="bk-info-group bk-text-right">
+                    <span class="bk-status bk-status--pending">${esc(STATUS_TEXT.pending)}</span>
+                    <span class="bk-trip">${tripLabel}</span>
+                </div>
+            </div>
+            <div class="bk-pending-row bk-row-bottom" data-expiry="${esc(b.expiry_time || '')}">
+                <div class="bk-info-group">
+                    <span class="bk-label">Sisa tagihan</span>
+                    <span class="bk-price">${formatRupiah(b.amount)}</span>
+                </div>
+                <div class="bk-info-group bk-text-right">
+                    <span class="bk-label">Sisa waktu</span>
+                    <span class="bk-countdown">--:--:--</span>
+                </div>
+            </div>
+            <button class="bk-pay" data-order="${esc(b.order_id)}">Bayar sekarang</button>
         </div>
     </div>`;
 }
@@ -196,7 +258,7 @@ function startCountdowns() {
 }
 
 function tick() {
-    document.querySelectorAll('#aktif .bk-countdown-wrap[data-expiry]').forEach(wrap => {
+    document.querySelectorAll('#aktif .bk-row-bottom[data-expiry]').forEach(wrap => {
         const raw = (wrap as HTMLElement).dataset.expiry;
         const out = wrap.querySelector('.bk-countdown') as HTMLElement | null;
         if (!raw || !out) return;
@@ -210,7 +272,7 @@ function tick() {
         if (left <= 0) {
             out.textContent = '00:00:00';
             out.classList.add('bk-countdown--urgent');
-            const btn = wrap.parentElement?.querySelector('.bk-pay') as HTMLButtonElement | null;
+            const btn = wrap.closest('.bk-booking')?.querySelector('.bk-pay') as HTMLButtonElement | null;
             if (btn && !btn.disabled) {
                 btn.disabled = true;
                 btn.textContent = 'Kedaluwarsa';
@@ -314,10 +376,16 @@ document.addEventListener('click', (ev) => {
     });
 });
 
-// Muat saat tab "Tiket Aktif" pertama kali dibuka
-document.addEventListener('DOMContentLoaded', () => {
-    const tab = document.querySelector('[data-target="aktif"]');
-    tab?.addEventListener('click', () => {
-        if (allBookings.length === 0) loadBookings();
-    }, { once: true });
-});
+/* ---------- Init ---------- */
+// Modul ini deferred, jadi DOM sudah siap saat baris ini jalan.
+// Jangan bungkus dengan DOMContentLoaded — event itu sudah lewat.
+
+const aktifTab = document.querySelector('[data-target="aktif"]');
+aktifTab?.addEventListener('click', () => {
+    if (allBookings.length === 0) loadBookings();
+}, { once: true });
+
+// Kalau tab "Tiket Aktif" sudah aktif saat halaman dimuat
+if (document.querySelector('#aktif.active-content')) {
+    loadBookings();
+}
