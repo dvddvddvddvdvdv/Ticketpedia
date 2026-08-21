@@ -1,0 +1,222 @@
+/* ============================================
+   Ringkasan pembayaran — kartu di atas filter
+   Tempel di tiket.css, SEBELUM blok RESPONSIVE
+   Memakai variabel yang sudah ada di :root
+   ============================================ */
+
+.bk-summary {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 24px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    background-color: #FFFFFF;
+    border: 1px solid var(--bk-border);
+    border-radius: var(--bk-radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ---------- Kolom kiri: total & CTA ---------- */
+
+.bk-summary-main {
+    display: flex;
+    gap: 14px;
+    padding-right: 24px;
+    border-right: 1px solid var(--bk-border);
+}
+
+.bk-summary-icon {
+    flex: 0 0 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bk-success-bg);
+    color: var(--bk-success-text);
+    border-radius: 50%;
+}
+
+.bk-summary-label {
+    margin: 0 0 4px;
+    font-size: 12px;
+    color: var(--bk-text-muted);
+}
+
+.bk-summary-total {
+    margin: 0 0 12px;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--bk-text);
+    letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+.bk-btn-payall {
+    padding: 10px 18px;
+    background-color: var(--bk-accent-blue);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.bk-btn-payall:hover:not(:disabled) {
+    background-color: var(--bk-accent-blue-hover);
+}
+
+.bk-btn-payall:disabled {
+    background-color: var(--bk-disabled);
+    cursor: not-allowed;
+}
+
+/* ---------- Kolom kanan: progres & statistik ---------- */
+
+.bk-progress-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: var(--bk-text-muted);
+}
+
+.bk-progress-head strong {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bk-text);
+}
+
+.bk-progress-track {
+    height: 6px;
+    margin-bottom: 10px;
+    background-color: var(--bk-neutral-bg);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bk-progress-fill {
+    height: 100%;
+    background-color: var(--bk-success-text);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.bk-progress-legend {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--bk-text-muted);
+}
+
+.bk-progress-legend b {
+    font-weight: 600;
+    color: var(--bk-text);
+}
+
+.bk-progress-legend .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 6px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.dot-paid {
+    background-color: var(--bk-success-text);
+}
+
+.dot-due {
+    background-color: var(--bk-border-strong);
+}
+
+.bk-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.bk-stat {
+    padding: 10px 12px;
+    background-color: var(--bk-neutral-bg);
+    border-radius: var(--bk-radius-sm);
+}
+
+.bk-stat-label {
+    margin: 0 0 3px;
+    font-size: 11px;
+    color: var(--bk-text-muted);
+}
+
+.bk-stat-value {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--bk-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.bk-stat-value.warn {
+    color: var(--bk-warning-text);
+}
+
+/* ---------- Responsive ----------
+   Breakpoint disamakan dengan kartu .bk-card */
+
+@media (max-width: 1040px) {
+    .bk-summary {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .bk-summary-main {
+        padding-right: 0;
+        padding-bottom: 20px;
+        border-right: none;
+        border-bottom: 1px solid var(--bk-border);
+    }
+}
+
+@media (max-width: 640px) {
+    .bk-summary {
+        padding: 16px;
+    }
+
+    .bk-summary-total {
+        font-size: 22px;
+    }
+
+    .bk-btn-payall {
+        width: 100%;
+    }
+
+    .bk-progress-legend {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .bk-stat-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .bk-stat {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 8px 12px;
+    }
+
+    .bk-stat-label {
+        margin: 0;
+    }
+
+    .bk-stat-value {
+        font-size: 15px;
+    }
+}

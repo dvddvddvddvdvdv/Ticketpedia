@@ -260,6 +260,10 @@
     margin-top: 8px;
 }
 
+.bk-booking .bk-pending-row .bk-trip {
+    margin-top: 28px;
+}
+
 .bk-payment {
     font-size: 12px;
     color: var(--bk-text-faint);
@@ -463,20 +467,238 @@
     background: var(--bk-accent-blue-hover);
 }
 
-@media (max-width: 640px) {
+/* ============================================
+   RESPONSIVE — tablet & ponsel
+   Tempel di AKHIR tiket.css.
+   Tampilan desktop (>1040px) tidak berubah sama sekali.
+   ============================================ */
+
+/* ---------- Tablet landscape (≤1040px) ----------
+   Grid sudah 1 kolom dari aturan yang ada.
+   Tinggi tetap diganti jadi minimum supaya konten tidak terpotong. */
+@media (max-width: 1040px) {
     .bk-card {
-        flex-direction: column;
         height: auto;
         min-height: var(--bk-card-height);
+        overflow: visible;
     }
+}
+
+/* ---------- iPad portrait & tablet kecil (≤900px) ----------
+   Kartu ditumpuk vertikal: maskapai → detail → info pemesanan. */
+@media (max-width: 900px) {
+    .bk-card {
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px;
+        height: auto;
+        min-height: 0;
+    }
+
+    /* Status pill keluar dari absolute, kembali ke alur normal */
+    .bk-status {
+        position: static;
+        align-self: flex-start;
+    }
+
+    .bk-airline {
+        flex: 0 0 auto;
+        align-self: flex-start;
+    }
+
+    .bk-airline img {
+        width: auto;
+        max-width: 100px;
+    }
+
     .bk-divider {
         width: 100%;
         height: 1px;
-        margin: 0;
+        align-self: auto;
     }
-    .bk-status {
-        position: static;
+
+    .bk-details {
+        justify-content: flex-start;
+    }
+
+    /* Spacer khusus desktop — dimatikan di layar kecil.
+       Selector diulang persis supaya specificity-nya menang. */
+    .bk-booking-info .bk-value {
+        padding-bottom: 0;
+    }
+
+    .bk-booking.bk-booking-pending .bk-pending-row:first-child .bk-label {
+        padding-top: 0;
+    }
+
+    .bk-booking {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .bk-booking-actions {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0;
+    }
+
+    .bk-qr {
+        width: 90px;
+        height: 90px;
+        padding: 8px;
+        margin-top: 0;
+    }
+
+    .bk-eticket-btn {
+        width: auto;
+        padding: 10px 16px;
+    }
+
+    .bk-leg-toggle {
+        top: 0;
+        width: 100%;
+        justify-content: center;
+        padding: 10px 20px;
+    }
+}
+
+/* ---------- Ponsel (≤640px) ---------- */
+@media (max-width: 640px) {
+    .bk-card {
+        padding: 16px;
+        gap: 12px;
+        min-height: 0;
+    }
+
+    .bk-header h2 {
+        font-size: 18px;
+    }
+
+    .bk-route {
+        font-size: 15px;
         margin-bottom: 12px;
-        align-self: flex-start;
     }
+
+    .bk-meta {
+        font-size: 13px;
+        gap: 10px;
+    }
+
+    .bk-price {
+        font-size: 16px;
+    }
+
+    .bk-countdown {
+        font-size: 24px;
+    }
+
+    /* Baris atas ditumpuk supaya kode pesanan tidak berdesakan
+       dengan status pill */
+    .bk-pending-row {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .bk-text-right {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    /* Baris bawah tetap berdampingan: tagihan kiri, countdown kanan */
+    .bk-row-bottom {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .bk-row-bottom .bk-text-right {
+        align-items: flex-end;
+        text-align: right;
+    }
+
+    .bk-booking-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .bk-qr {
+        align-self: center;
+    }
+
+    .bk-eticket-btn {
+        width: 100%;
+    }
+
+    /* Filter chip lebih rapat */
+    .bk-filters {
+        gap: 6px;
+    }
+
+    .bk-filter {
+        padding: 5px 12px;
+        font-size: 12px;
+    }
+}
+
+/* ---------- Ponsel kecil (≤380px) ---------- */
+@media (max-width: 380px) {
+    .bk-card {
+        padding: 14px;
+    }
+
+    .bk-countdown {
+        font-size: 20px;
+    }
+
+    .bk-value {
+        font-size: 12px;
+        word-break: break-all;
+    }
+}
+
+/* ============================================
+   Tambahan untuk tiket.css
+   Tempel SEBELUM blok @media RESPONSIVE.
+   ============================================ */
+
+/* Teks instruksi pengganti countdown di kartu pending */
+.bk-note {
+    font-size: 12px;
+    color: var(--bk-text-muted);
+    line-height: 1.5;
+    text-align: right;
+}
+
+/* ---------- Status KEDALUWARSA ---------- */
+
+/* Kartu kedaluwarsa diredupkan supaya jelas tidak aktif lagi */
+.bk-card--expired {
+    background-color: #FAFAFA;
+    border-color: #EDEDF0;
+    box-shadow: none;
+}
+
+.bk-card--expired .bk-airline img,
+.bk-card--expired .bk-meta img {
+    opacity: 0.35;
+    filter: grayscale(1);
+}
+
+.bk-card--expired .bk-route,
+.bk-card--expired .bk-meta {
+    color: var(--bk-text-faint);
+}
+
+.bk-card--expired .bk-leg-toggle {
+    opacity: 0.6;
+}
+
+/* Harga dicoret — tagihan sudah tidak berlaku */
+.bk-price--void {
+    text-decoration: line-through;
+    color: var(--bk-text-faint);
+    font-weight: 600;
 }

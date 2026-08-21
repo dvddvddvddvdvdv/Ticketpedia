@@ -2,6 +2,11 @@ import { pb } from '../../src/pocketbase';
 
 const API_BASE = 'https://db.zizazu.my.id';
 
+/* ---------- State & Constants ---------- */
+
+let allBookings: any[] = [];
+let activeFilter = 'all';
+
 const cityNames: Record<string, string> = {
     CGK: 'Jakarta (CGK)',
     JED: 'Jeddah (JED)',
@@ -9,6 +14,14 @@ const cityNames: Record<string, string> = {
     SUB: 'Surabaya (SUB)',
     DPS: 'Bali (DPS)',
 };
+
+const STATUS_TEXT: Record<string, string> = {
+    paid: 'Lunas',
+    pending: 'Menunggu pembayaran',
+    failed: 'Kedaluwarsa',
+};
+
+/* ---------- Utility Helpers ---------- */
 
 function getCityName(code: string): string {
     return cityNames[code] || code;
@@ -31,11 +44,15 @@ function parseRoute(routeStr: string): string {
     return esc(routeStr);
 }
 
-// Excel serial (46151) -> "06 Sep 2026"
+function getExcelDate(serialNumber: unknown): Date | null {
+    const serial = Number(serialNumber);
+    if (!serial || isNaN(serial)) return null;
+    return new Date(Math.round((serial - 25569) * 86400 * 1000));
+}
+
 function formatDate(value: unknown): string {
-    const serial = Number(value);
-    if (!serial || isNaN(serial)) return esc(value);
-    const d = new Date(Math.round((serial - 25569) * 86400 * 1000));
+    const d = getExcelDate(value);
+    if (!d) return esc(value);
     return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
@@ -43,15 +60,40 @@ function formatRupiah(n: unknown): string {
     return 'Rp ' + (Number(n) || 0).toLocaleString('id-ID');
 }
 
-const STATUS_TEXT: Record<string, string> = {
-    paid: 'Lunas',
-    pending: 'Menunggu pembayaran',
-    failed: 'Kedaluwarsa',
-};
+function setText(id: string, value: string) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
 
-let allBookings: any[] = [];
-let activeFilter = 'all';
-let tickHandle: number | null = null;
+/* ---------- Normalisasi Data Booking ---------- */
+
+function getAmount(b: any): number {
+    if (typeof b.gross_amount === 'number') return b.gross_amount;
+    if (typeof b.amount === 'number') return b.amount;
+    if (typeof b.total === 'number') return b.total;
+
+    const flight = b.expand?.flight ?? b.expand?.flightId;
+    if (flight) {
+        return ((Number(flight.jual) || 0) + (Number(flight.markup) || 0)) * 1000;
+    }
+    return 0;
+}
+
+function getStatus(b: any): 'paid' | 'pending' | 'failed' {
+    const raw = String(b.status ?? '').toLowerCase();
+    if (['paid', 'settlement', 'capture', 'success', 'lunas'].includes(raw)) return 'paid';
+    if (['expire', 'expired', 'cancel', 'deny', 'failure', 'failed'].includes(raw)) return 'failed';
+    return 'pending';
+}
+
+function getDepartureDate(b: any): Date | null {
+    const flight = b.expand?.flight ?? b.expand?.flightId;
+    if (flight?.dot) return getExcelDate(flight.dot);
+    if (b.departure) return new Date(b.departure);
+    return null;
+}
+
+/* ---------- Data Fetching ---------- */
 
 export async function loadBookings() {
     const list = document.querySelector('#aktif .bk-list');
@@ -72,17 +114,19 @@ export async function loadBookings() {
         try {
             res = await pb.collection('bookings').getList(1, 50, {
                 sort: '-created',
-                expand: 'flight',
+                expand: 'flight,flightId',
             });
         } catch {
-            // Fallback: collection belum punya field autodate 'created'
+            // Fallback kalau field autodate 'created' belum ada
             res = await pb.collection('bookings').getList(1, 50, {
-                expand: 'flight',
+                expand: 'flight,flightId',
             });
         }
         allBookings = res.items;
+
         renderBookings();
-        startCountdowns();
+        renderSummary(allBookings);
+
     } catch (err: any) {
         console.error('Gagal memuat pesanan:', err.status, err.response);
         list.innerHTML = `
@@ -93,13 +137,61 @@ export async function loadBookings() {
     }
 }
 
+/* ---------- Render UI: Summary Dashboard ---------- */
+
+export function renderSummary(bookings: any[]): void {
+    const active = bookings.filter(b => getStatus(b) !== 'failed');
+
+    const total = active.reduce((sum, b) => sum + getAmount(b), 0);
+    const paid = active
+        .filter(b => getStatus(b) === 'paid')
+        .reduce((sum, b) => sum + getAmount(b), 0);
+    const due = total - paid;
+    const pendingList = active.filter(b => getStatus(b) === 'pending');
+    const percent = total > 0 ? Math.round((paid / total) * 100) : 0;
+
+    const daysToNext = active
+        .map(getDepartureDate)
+        .filter((d): d is Date => d instanceof Date && !isNaN(d.getTime()))
+        .map(d => Math.ceil((d.getTime() - Date.now()) / 86_400_000))
+        .filter(d => d >= 0)
+        .sort((a, b) => a - b)[0];
+
+    setText('sum-total', formatRupiah(total));
+    setText('sum-paid', formatRupiah(paid));
+    setText('sum-due', formatRupiah(due));
+    setText('sum-percent', `${percent}% lunas`);
+    setText('sum-active', String(active.length));
+    setText('sum-pending', String(pendingList.length));
+    setText('sum-next', daysToNext !== undefined ? `${daysToNext} hari` : '—');
+
+    const bar = document.getElementById('sum-bar');
+    if (bar) bar.style.width = `${percent}%`;
+
+    const btn = document.getElementById('btnPayAll') as HTMLButtonElement | null;
+    if (!btn) return;
+
+    if (pendingList.length === 0) {
+        btn.disabled = true;
+        btn.textContent = active.length ? 'Semua lunas' : 'Belum ada pesanan';
+        btn.onclick = null;
+        return;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Bayar sepenuhnya';
+    btn.onclick = () => payAll(pendingList, btn);
+}
+
+/* ---------- Render UI: Ticket List ---------- */
+
 function renderBookings() {
     const list = document.querySelector('#aktif .bk-list');
     if (!list) return;
 
     const rows = activeFilter === 'all'
         ? allBookings
-        : allBookings.filter(b => b.status === activeFilter);
+        : allBookings.filter(b => getStatus(b) === activeFilter);
 
     if (rows.length === 0) {
         list.innerHTML = `
@@ -115,8 +207,9 @@ function renderBookings() {
 }
 
 function cardHTML(b: any): string {
-    const f = b.expand?.flight || {};
-    const status: string = b.status || 'pending';
+    const f = b.expand?.flight || b.expand?.flightId || {};
+    const status = getStatus(b);
+    const amount = getAmount(b);
     const vendor = String(f.vendor || 'Garuda');
     const tripLabel = `${esc(f.prog)} &middot; ${esc(f.day)}`;
 
@@ -170,7 +263,7 @@ function cardHTML(b: any): string {
                     </div>
                     <div class="bk-info-group">
                         <span class="bk-label">Total bayar</span>
-                        <span class="bk-price">${formatRupiah(b.amount)}</span>
+                        <span class="bk-price">${formatRupiah(amount)}</span>
                     </div>
                     <div class="bk-info-group">
                         <span class="bk-trip">${tripLabel}</span>
@@ -188,7 +281,7 @@ function cardHTML(b: any): string {
 
     if (status === 'failed') {
         return `
-        <div class="bk-card" data-id="${esc(b.id)}">
+        <div class="bk-card bk-card--expired" data-id="${esc(b.id)}">
             ${airlineBlock}
             ${detailsBlock}
 
@@ -205,11 +298,8 @@ function cardHTML(b: any): string {
                 </div>
                 <div class="bk-pending-row bk-row-bottom">
                     <div class="bk-info-group">
-                        <span class="bk-label">Sisa tagihan</span>
-                        <span class="bk-price">${formatRupiah(b.amount)}</span>
-                    </div>
-                    <div class="bk-info-group bk-text-right">
-                        <span class="bk-label">Batas waktu habis</span>
+                        <span class="bk-label">Tagihan dibatalkan</span>
+                        <span class="bk-price bk-price--void">${formatRupiah(amount)}</span>
                     </div>
                 </div>
                 <button class="bk-pay bk-pay--expired" disabled>Kedaluwarsa</button>
@@ -217,7 +307,7 @@ function cardHTML(b: any): string {
         </div>`;
     }
 
-    // pending
+    // pending — tanpa countdown, hanya instruksi
     return `
     <div class="bk-card" data-id="${esc(b.id)}">
         ${airlineBlock}
@@ -234,14 +324,13 @@ function cardHTML(b: any): string {
                     <span class="bk-trip">${tripLabel}</span>
                 </div>
             </div>
-            <div class="bk-pending-row bk-row-bottom" data-expiry="${esc(b.expiry_time || '')}">
+            <div class="bk-pending-row bk-row-bottom">
                 <div class="bk-info-group">
-                    <span class="bk-label">Sisa tagihan</span>
-                    <span class="bk-price">${formatRupiah(b.amount)}</span>
+                    <span class="bk-label">Total tagihan</span>
+                    <span class="bk-price">${formatRupiah(amount)}</span>
                 </div>
                 <div class="bk-info-group bk-text-right">
-                    <span class="bk-label">Sisa waktu</span>
-                    <span class="bk-countdown">--:--:--</span>
+                    <span class="bk-note">Selesaikan pembayaran<br>sesuai instruksi</span>
                 </div>
             </div>
             <button class="bk-pay" data-order="${esc(b.order_id)}">Bayar sekarang</button>
@@ -249,95 +338,37 @@ function cardHTML(b: any): string {
     </div>`;
 }
 
-/* ---------- Countdown ---------- */
+/* ---------- Payments (Bulk & Single) ---------- */
 
-function startCountdowns() {
-    if (tickHandle) window.clearInterval(tickHandle);
-    tick();
-    tickHandle = window.setInterval(tick, 1000);
-}
-
-function tick() {
-    document.querySelectorAll('#aktif .bk-row-bottom[data-expiry]').forEach(wrap => {
-        const raw = (wrap as HTMLElement).dataset.expiry;
-        const out = wrap.querySelector('.bk-countdown') as HTMLElement | null;
-        if (!raw || !out) return;
-
-        // Midtrans kirim "2026-08-20 09:36:43" (WIB) — jadikan ISO
-        const expiry = new Date(raw.replace(' ', 'T') + '+07:00').getTime();
-        const left = expiry - Date.now();
-
-        if (isNaN(expiry)) { out.textContent = '--:--:--'; return; }
-
-        if (left <= 0) {
-            out.textContent = '00:00:00';
-            out.classList.add('bk-countdown--urgent');
-            const btn = wrap.closest('.bk-booking')?.querySelector('.bk-pay') as HTMLButtonElement | null;
-            if (btn && !btn.disabled) {
-                btn.disabled = true;
-                btn.textContent = 'Kedaluwarsa';
-                btn.classList.add('bk-pay--expired');
-            }
-            return;
-        }
-
-        const h = Math.floor(left / 3600000);
-        const m = Math.floor((left % 3600000) / 60000);
-        const s = Math.floor((left % 60000) / 1000);
-        const p = (n: number) => String(n).padStart(2, '0');
-        out.textContent = `${p(h)}:${p(m)}:${p(s)}`;
-        out.classList.toggle('bk-countdown--urgent', left < 3600000);
-    });
-}
-
-/* ---------- Aksi ---------- */
-
-document.addEventListener('click', async (ev) => {
-    const target = ev.target as HTMLElement;
-
-    const filter = target.closest('.bk-filter') as HTMLElement | null;
-    if (filter) {
-        document.querySelectorAll('.bk-filter').forEach(f => f.classList.remove('active'));
-        filter.classList.add('active');
-        activeFilter = filter.dataset.status || 'all';
-        renderBookings();
-        startCountdowns();
+async function payAll(pendingList: any[], btn: HTMLButtonElement): Promise<void> {
+    if (!pb.authStore.isValid) {
+        alert('Sesi Anda telah berakhir. Silakan login kembali.');
+        window.location.href = '/login.html';
         return;
     }
 
-    const btn = target.closest('.bk-pay') as HTMLButtonElement | null;
-    if (!btn || btn.disabled) return;
+    const jumlah = pendingList.length;
+    const totalDue = pendingList.reduce((sum, b) => sum + getAmount(b), 0);
+
+    if (!confirm(`Bayar ${jumlah} tagihan sekaligus senilai ${formatRupiah(totalDue)}?`)) return;
 
     btn.disabled = true;
     btn.textContent = 'Memproses…';
 
-    const reset = () => {
-        btn.disabled = false;
-        btn.textContent = 'Bayar sekarang';
-    };
-
     try {
-        const res = await fetch(`${API_BASE}/api/midtrans/token`, {
+        const res = await fetch(`${API_BASE}/api/midtrans/token-bulk`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': pb.authStore.token,
             },
-            body: JSON.stringify({ orderId: btn.dataset.order }),
+            body: JSON.stringify({
+                bookingIds: pendingList.map(b => b.id),
+            }),
         });
 
         const data = await res.json().catch(() => ({}));
-        if (!res.ok || !data.token) {
-            throw new Error(data.error || `Gagal memuat pembayaran (${res.status}).`);
-        }
-
-        // PENTING: setiap kali klik "Bayar sekarang", hook membuat order_id
-        // baru (order lama tidak bisa dipakai ulang di Midtrans) dan
-        // memperbarui baris booking. Kalau tombol masih menyimpan order_id
-        // lama, klik berikutnya akan gagal "Pesanan tidak ditemukan".
-        if (data.orderId) {
-            btn.dataset.order = data.orderId;
-        }
+        if (!res.ok) throw new Error(data.error || `Gagal (${res.status})`);
 
         if (!(window as any).snap) {
             throw new Error('Modul pembayaran belum termuat. Muat ulang halaman.');
@@ -346,46 +377,117 @@ document.addEventListener('click', async (ev) => {
         (window as any).snap.pay(data.token, {
             onSuccess: () => loadBookings(),
             onPending: () => loadBookings(),
-            onError: reset,
-            onClose: reset,
+            onError: () => {
+                alert('Pembayaran gagal. Silakan coba lagi.');
+                resetButton(btn);
+            },
+            onClose: () => resetButton(btn),
         });
     } catch (err) {
-        alert(err instanceof Error ? err.message : 'Terjadi kesalahan.');
-        reset();
+        console.error('Gagal membuat token pembayaran gabungan:', err);
+        alert(err instanceof Error ? err.message : 'Terjadi kesalahan saat memproses pembayaran.');
+        resetButton(btn);
+    }
+}
+
+function resetButton(btn: HTMLButtonElement) {
+    btn.disabled = false;
+    btn.textContent = 'Bayar sepenuhnya';
+}
+
+/* ---------- Event Listeners ---------- */
+
+document.addEventListener('click', async (ev) => {
+    const target = ev.target as HTMLElement;
+
+    // Filter toggle
+    const filter = target.closest('.bk-filter') as HTMLElement | null;
+    if (filter) {
+        document.querySelectorAll('.bk-filter').forEach(f => f.classList.remove('active'));
+        filter.classList.add('active');
+        activeFilter = filter.dataset.status || 'all';
+        renderBookings();
+        return;
+    }
+
+    // Tombol bayar per tiket
+    const btn = target.closest('.bk-pay') as HTMLButtonElement | null;
+    if (btn && !btn.disabled) {
+        btn.disabled = true;
+        btn.textContent = 'Memproses…';
+
+        const resetSingleBtn = () => {
+            btn.disabled = false;
+            btn.textContent = 'Bayar sekarang';
+        };
+
+        try {
+            const res = await fetch(`${API_BASE}/api/midtrans/token`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': pb.authStore.token,
+                },
+                body: JSON.stringify({ orderId: btn.dataset.order }),
+            });
+
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.token) {
+                throw new Error(data.error || `Gagal memuat pembayaran (${res.status}).`);
+            }
+
+            // Hook membuat order_id baru tiap kali bayar ulang —
+            // tombol harus ikut diperbarui, kalau tidak klik berikutnya
+            // akan gagal "Pesanan tidak ditemukan".
+            if (data.orderId) {
+                btn.dataset.order = data.orderId;
+            }
+
+            if (!(window as any).snap) {
+                throw new Error('Modul pembayaran belum termuat. Muat ulang halaman.');
+            }
+
+            (window as any).snap.pay(data.token, {
+                onSuccess: () => loadBookings(),
+                onPending: () => loadBookings(),
+                onError: resetSingleBtn,
+                onClose: resetSingleBtn,
+            });
+        } catch (err) {
+            alert(err instanceof Error ? err.message : 'Terjadi kesalahan.');
+            resetSingleBtn();
+        }
+        return;
+    }
+
+    // Toggle pergi / pulang
+    const toggle = target.closest('.bk-leg-toggle') as HTMLElement | null;
+    if (toggle) {
+        const card = toggle.closest('.bk-card');
+        const label = toggle.querySelector('span');
+        if (!card || !label) return;
+
+        const isPergi = toggle.dataset.leg === 'pergi';
+        const nextLeg = isPergi ? 'pulang' : 'pergi';
+
+        toggle.dataset.leg = nextLeg;
+        label.textContent = isPergi ? 'penerbangan pulang' : 'penerbangan pergi';
+
+        card.querySelectorAll('.bk-leg-field').forEach(field => {
+            const el = field as HTMLElement;
+            el.textContent = el.dataset[nextLeg] || '';
+        });
     }
 });
 
-// Toggle tampilan penerbangan pergi / pulang
-document.addEventListener('click', (ev) => {
-    const toggle = (ev.target as HTMLElement).closest('.bk-leg-toggle') as HTMLElement | null;
-    if (!toggle) return;
-
-    const card = toggle.closest('.bk-card');
-    const label = toggle.querySelector('span');
-    if (!card || !label) return;
-
-    const isPergi = toggle.dataset.leg === 'pergi';
-    const nextLeg = isPergi ? 'pulang' : 'pergi';
-
-    toggle.dataset.leg = nextLeg;
-    label.textContent = isPergi ? 'penerbangan pulang' : 'penerbangan pergi';
-
-    card.querySelectorAll('.bk-leg-field').forEach(field => {
-        const el = field as HTMLElement;
-        el.textContent = el.dataset[nextLeg] || '';
-    });
-});
-
-/* ---------- Init ---------- */
-// Modul ini deferred, jadi DOM sudah siap saat baris ini jalan.
-// Jangan bungkus dengan DOMContentLoaded — event itu sudah lewat.
+/* ---------- Initialization ---------- */
 
 const aktifTab = document.querySelector('[data-target="aktif"]');
 aktifTab?.addEventListener('click', () => {
     if (allBookings.length === 0) loadBookings();
 }, { once: true });
 
-// Kalau tab "Tiket Aktif" sudah aktif saat halaman dimuat
+// Kalau tab sudah aktif saat halaman dimuat
 if (document.querySelector('#aktif.active-content')) {
     loadBookings();
 }

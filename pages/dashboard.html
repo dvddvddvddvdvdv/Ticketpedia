@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TicketPedia - Dashboard</title>
     
     <!-- Added Bootstrap 5 CDN -->
@@ -11,6 +12,7 @@
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/tab-style/buy.css">
     <link rel="stylesheet" href="/css/tab-style/tiket.css">
+    <link rel="stylesheet" href="/css/tab-style/bk-summary.css">
     <link rel="stylesheet" href="/css/cart-bar.css">
 
     <script src="https://app.sandbox.midtrans.com/snap/snap.js"
@@ -107,6 +109,52 @@
             <div class="bk-header">
                 <h2>Informasi Pembookingan</h2>
                 <p>semua ticket yang telah di book</p>
+            </div>
+
+            <!-- Ringkasan pembayaran -->
+            <div class="bk-summary">
+                <div class="bk-summary-main">
+                    <div class="bk-summary-icon">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2 2 0 0 0 0 6v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2 2 0 0 0 0-6z"></path>
+                            <path d="M15 6v12" stroke-dasharray="2 3"></path>
+                        </svg>
+                    </div>
+                    <div class="bk-summary-info">
+                        <p class="bk-summary-label">Total Pembelian ticket</p>
+                        <p class="bk-summary-total" id="sum-total">Rp 0</p>
+                        <button class="bk-btn-payall" id="btnPayAll">Bayar sepenuhnya</button>
+                    </div>
+                </div>
+
+                <div class="bk-summary-side">
+                    <div class="bk-progress-head">
+                        <span>Status pembayaran</span>
+                        <strong id="sum-percent">0% lunas</strong>
+                    </div>
+                    <div class="bk-progress-track">
+                        <div class="bk-progress-fill" id="sum-bar" style="width:0%"></div>
+                    </div>
+                    <div class="bk-progress-legend">
+                        <span><i class="dot dot-paid"></i>Terbayar <b id="sum-paid">Rp 0</b></span>
+                        <span><i class="dot dot-due"></i>Sisa <b id="sum-due">Rp 0</b></span>
+                    </div>
+
+                    <div class="bk-stat-grid">
+                        <div class="bk-stat">
+                            <p class="bk-stat-label">Tiket aktif</p>
+                            <p class="bk-stat-value" id="sum-active">0</p>
+                        </div>
+                        <div class="bk-stat">
+                            <p class="bk-stat-label">Nunggu bayar</p>
+                            <p class="bk-stat-value warn" id="sum-pending">0</p>
+                        </div>
+                        <div class="bk-stat">
+                            <p class="bk-stat-label">Terbang dalam</p>
+                            <p class="bk-stat-value" id="sum-next">&mdash;</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="bk-filters">

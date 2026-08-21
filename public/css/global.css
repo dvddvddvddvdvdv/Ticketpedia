@@ -105,3 +105,188 @@ main {
     font-size: 2ch;
     color: #9C9B9B;
 }
+
+/* ============================================
+   RESPONSIVE — global layout
+   Tempel di AKHIR global.css.
+   Desktop (>900px) tidak berubah sama sekali.
+   ============================================ */
+
+/* ---------- Tablet (≤900px) ----------
+   Sidebar tetap di kiri, hanya diciutkan jadi ikon saja. */
+@media (max-width: 900px) {
+    :root {
+        --sidebar-width: 82px;
+        --top-nav-height: 88px;
+    }
+
+    .nav {
+        padding-top: 24px;
+    }
+
+    .title,
+    .menu {
+        display: none;
+    }
+
+    .selection img {
+        padding-left: 0;
+        width: 46%;
+    }
+
+    .nav .icon {
+        gap: 18px !important;
+    }
+
+    .top-nav img {
+        width: 60px;
+    }
+
+    .top-icon > a {
+        margin-right: 12px;
+    }
+
+    .top-icon > a img {
+        width: 42px;
+    }
+
+    .user-profile a img {
+        width: 46px;
+    }
+
+    .username {
+        font-size: 14px;
+    }
+
+    .Email-name {
+        font-size: 12px;
+    }
+}
+
+/* ---------- Ponsel (≤640px) ----------
+   Sidebar pindah ke bawah jadi bottom navigation. */
+@media (max-width: 640px) {
+    :root {
+        --sidebar-width: 0px;
+        --top-nav-height: 64px;
+        --bottom-nav-height: 62px;
+    }
+
+    /* --- Sidebar → bottom bar --- */
+    .nav {
+        top: auto;
+        bottom: var(--spacing);
+        left: var(--spacing);
+        right: var(--spacing);
+        width: auto;
+        height: var(--bottom-nav-height);
+        padding-top: 0;
+        z-index: 10000;
+        box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* .icon pakai Bootstrap .flex-column — perlu !important untuk dibalik */
+    .nav .icon {
+        flex-direction: row !important;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        gap: 0 !important;
+    }
+
+    .title,
+    .menu {
+        display: none;
+    }
+
+    .selection {
+        flex: 1;
+        width: auto !important;
+        justify-content: center;
+        padding: 0;
+    }
+
+    .selection img {
+        padding-left: 0;
+        width: auto;
+        max-height: 26px;
+    }
+
+    /* Indikator halaman aktif disembunyikan — posisinya dirancang
+       untuk sidebar vertikal, tidak cocok di bottom bar */
+    .selection .selected {
+        display: none;
+    }
+
+    /* --- Top nav --- */
+    .top-nav {
+        left: var(--spacing);
+    }
+
+    .top-icon {
+        padding: 0 14px !important;
+    }
+
+    .top-nav img {
+        width: 46px;
+    }
+
+    .top-icon > a {
+        margin-right: 8px;
+    }
+
+    .top-icon > a img {
+        width: 30px;
+    }
+
+    .user-profile {
+        gap: 8px !important;
+        padding-left: 10px !important;
+    }
+
+    .user-profile a img {
+        width: 34px;
+    }
+
+    .username {
+        font-size: 12px;
+        max-width: 90px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .Email-name {
+        display: none;
+    }
+
+    /* --- Main content --- */
+    main {
+        margin-left: 0;
+        padding-left: var(--spacing);
+        padding-right: var(--spacing);
+        /* ruang untuk bottom nav */
+        padding-bottom: calc(var(--bottom-nav-height) + var(--spacing) * 2);
+    }
+
+    /* Cart bar naik supaya tidak tertutup bottom nav */
+    #cart-bar {
+        bottom: calc(var(--bottom-nav-height) + var(--spacing) * 2);
+    }
+}
+
+/* ---------- Ponsel kecil (≤400px) ---------- */
+@media (max-width: 400px) {
+    .top-icon > a:not(:last-of-type) {
+        display: none;
+    }
+
+    .username {
+        max-width: 70px;
+    }
+
+    .selection img {
+        max-height: 23px;
+    }
+}
