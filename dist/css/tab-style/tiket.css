@@ -1,0 +1,704 @@
+/* ============================================
+   Tiket Aktif — kartu pembookingan
+   Prefix .bk- supaya tidak bentrok dengan buy.css
+   ============================================ */
+
+:root {
+    --bk-text: #111827;
+    --bk-text-secondary: #374151;
+    --bk-text-muted: #6B7280;
+    --bk-text-faint: #9CA3AF;
+
+    --bk-border: #E5E7EB;
+    --bk-border-strong: #D1D5DB;
+
+    --bk-accent: #4338CA;
+    --bk-accent-blue: #3283e7;
+    --bk-accent-blue-hover: #206ac7;
+
+    --bk-success-bg: #E8F5E9;
+    --bk-success-text: #1B5E20;
+    --bk-warning-bg: #FEF3C7;
+    --bk-warning-text: #D97706;
+    --bk-neutral-bg: #F3F4F6;
+    --bk-neutral-text: #6B7280;
+    --bk-danger: #DC2626;
+    --bk-disabled: #D1D5DB;
+
+    --bk-radius: 12px;
+    --bk-radius-sm: 6px;
+    --bk-card-height: 290px;
+}
+
+/* ---------- Header ---------- */
+
+.bk-header {
+    margin: 8px 0 20px;
+}
+
+.bk-header h2 {
+    margin: 0 0 2px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--bk-text);
+}
+
+.bk-header p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--bk-text-faint);
+}
+
+/* ---------- Filter ---------- */
+
+.bk-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.bk-filter {
+    padding: 6px 14px;
+    background: #FFFFFF;
+    border: 1px solid var(--bk-border-strong);
+    border-radius: 999px;
+    font-size: 13px;
+    color: var(--bk-text-secondary);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.bk-filter:hover {
+    border-color: var(--bk-accent-blue);
+}
+
+.bk-filter.active {
+    background: var(--bk-accent-blue);
+    border-color: var(--bk-accent-blue);
+    color: #FFFFFF;
+}
+
+/* ---------- Grid ---------- */
+
+.bk-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-items: stretch;
+}
+
+@media (max-width: 1040px) {
+    .bk-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Kartu ---------- */
+
+.bk-card {
+    position: relative;
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+    height: var(--bk-card-height);
+    background-color: #FFFFFF;
+    border: 1px solid var(--bk-border);
+    border-radius: var(--bk-radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.bk-status {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+}
+
+/* --- Kolom 1: Maskapai --- */
+
+.bk-airline {
+    flex: 0 0 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bk-airline img {
+    width: 180%;
+    max-width: 120px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* --- Kolom 2: Detail penerbangan --- */
+
+.bk-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+}
+
+.bk-route {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--bk-text);
+    margin-bottom: 15px;
+}
+
+.bk-meta-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.bk-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--bk-text-secondary);
+}
+
+.bk-meta img {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+/* Tombol toggle pergi/pulang */
+.bk-booking.bk-booking-pending .bk-pending-row:first-child .bk-label {
+    padding-top: 30px;
+}
+
+.bk-booking-info .bk-value {
+    padding-bottom: 90px;
+}
+
+.bk-leg-toggle {
+    display: inline-flex;
+    top: 10px;
+    position: relative;
+    align-items: center;
+    gap: 5px;
+    width: fit-content;
+    padding: 12px 40px;
+    background-color: #F0EFEF;
+    border: 1px solid var(--bk-border-strong);
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bk-accent);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.bk-leg-toggle:hover {
+    background: #b2b2b2;
+}
+
+.bk-leg-toggle img {
+    width: 14px;
+    height: 14px;
+}
+
+
+.bk-leg-toggle span {
+    color: #3283e7;
+}
+/* --- Kolom 3: Pembatas --- */
+
+.bk-divider {
+    width: 1px;
+    background-color: var(--bk-border);
+    align-self: stretch;
+}
+
+/* ---------- Kolom 4: Info pemesanan (bersama) ---------- */
+
+.bk-booking {
+    flex: 1.1;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 0;
+}
+
+.bk-info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+
+
+.bk-label {
+    font-size: 12px;
+    color: var(--bk-text-muted);
+}
+
+.bk-value {
+    font-size: 13px;
+    color: var(--bk-text);
+}
+
+.bk-price {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--bk-text);
+}
+
+.bk-trip {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bk-text-secondary);
+    margin-top: 8px;
+}
+
+.bk-booking .bk-pending-row .bk-trip {
+    margin-top: 28px;
+}
+
+.bk-payment {
+    font-size: 12px;
+    color: var(--bk-text-faint);
+    margin-top: 2px;
+}
+
+/* Status pill */
+
+.bk-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.bk-status::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.bk-status--paid {
+    background-color: var(--bk-success-bg);
+    color: var(--bk-success-text);
+}
+
+.bk-status--pending {
+    background-color: var(--bk-warning-bg);
+    color: var(--bk-warning-text);
+}
+
+.bk-status--failed {
+    background-color: var(--bk-neutral-bg);
+    color: var(--bk-neutral-text);
+}
+
+/* ---------- Layout LUNAS ---------- */
+
+.bk-booking-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.bk-booking-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 4px 0;
+}
+
+.bk-qr {
+    width: 106px;
+    height: 106px;
+    display: flex;
+    margin-top: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    background: var(--bk-neutral-bg);
+    border-radius: var(--bk-radius-sm);
+    font-size: 10px;
+    color: var(--bk-text-faint);
+    text-align: center;
+}
+
+.bk-eticket-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 6px;
+    padding: 8px;
+    color: var(--bk-accent);
+    background: #FFFFFF;
+    border: 1px solid var(--bk-accent);
+    border-radius: var(--bk-radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.bk-eticket-btn:disabled {
+    color: var(--bk-text-faint);
+    border-color: var(--bk-border-strong);
+    cursor: not-allowed;
+}
+
+/* ---------- Layout PENDING / FAILED ---------- */
+
+.bk-booking-pending {
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.bk-pending-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.bk-row-bottom {
+    margin-top: auto;
+    align-items: flex-end;
+}
+
+.bk-text-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    gap: 6px;
+}
+
+.bk-countdown {
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--bk-text);
+    line-height: 1;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+.bk-countdown--urgent {
+    color: var(--bk-danger);
+}
+
+.bk-pay {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px;
+    background-color: var(--bk-accent-blue);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.bk-pay:hover:not(:disabled) {
+    background-color: var(--bk-accent-blue-hover);
+}
+
+.bk-pay:disabled {
+    background-color: var(--bk-disabled);
+    cursor: not-allowed;
+}
+
+.bk-pay--expired {
+    background: transparent;
+    border: 1px solid var(--bk-border-strong);
+    color: var(--bk-text-faint);
+}
+
+.bk-pay--expired:hover:not(:disabled) {
+    background: transparent;
+}
+
+/* ---------- Kosong ---------- */
+
+.bk-empty {
+    grid-column: 1 / -1;
+    padding: 48px 20px;
+    text-align: center;
+    color: var(--bk-text-faint);
+}
+
+.bk-empty h3 {
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--bk-text-secondary);
+}
+
+.bk-empty p {
+    margin: 0 0 16px;
+    font-size: 14px;
+}
+
+.bk-empty button {
+    padding: 9px 18px;
+    background: var(--bk-accent-blue);
+    border: none;
+    border-radius: var(--bk-radius-sm);
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.bk-empty button:hover {
+    background: var(--bk-accent-blue-hover);
+}
+
+/* ============================================
+   RESPONSIVE — tablet & ponsel
+   Tempel di AKHIR tiket.css.
+   Tampilan desktop (>1040px) tidak berubah sama sekali.
+   ============================================ */
+
+/* ---------- Tablet landscape (≤1040px) ----------
+   Grid sudah 1 kolom dari aturan yang ada.
+   Tinggi tetap diganti jadi minimum supaya konten tidak terpotong. */
+@media (max-width: 1040px) {
+    .bk-card {
+        height: auto;
+        min-height: var(--bk-card-height);
+        overflow: visible;
+    }
+}
+
+/* ---------- iPad portrait & tablet kecil (≤900px) ----------
+   Kartu ditumpuk vertikal: maskapai → detail → info pemesanan. */
+@media (max-width: 900px) {
+    .bk-card {
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px;
+        height: auto;
+        min-height: 0;
+    }
+
+    /* Status pill keluar dari absolute, kembali ke alur normal */
+    .bk-status {
+        position: static;
+        align-self: flex-start;
+    }
+
+    .bk-airline {
+        flex: 0 0 auto;
+        align-self: flex-start;
+    }
+
+    .bk-airline img {
+        width: auto;
+        max-width: 100px;
+    }
+
+    .bk-divider {
+        width: 100%;
+        height: 1px;
+        align-self: auto;
+    }
+
+    .bk-details {
+        justify-content: flex-start;
+    }
+
+    /* Spacer khusus desktop — dimatikan di layar kecil.
+       Selector diulang persis supaya specificity-nya menang. */
+    .bk-booking-info .bk-value {
+        padding-bottom: 0;
+    }
+
+    .bk-booking.bk-booking-pending .bk-pending-row:first-child .bk-label {
+        padding-top: 0;
+    }
+
+    .bk-booking {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .bk-booking-actions {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0;
+    }
+
+    .bk-qr {
+        width: 90px;
+        height: 90px;
+        padding: 8px;
+        margin-top: 0;
+    }
+
+    .bk-eticket-btn {
+        width: auto;
+        padding: 10px 16px;
+    }
+
+    .bk-leg-toggle {
+        top: 0;
+        width: 100%;
+        justify-content: center;
+        padding: 10px 20px;
+    }
+}
+
+/* ---------- Ponsel (≤640px) ---------- */
+@media (max-width: 640px) {
+    .bk-card {
+        padding: 16px;
+        gap: 12px;
+        min-height: 0;
+    }
+
+    .bk-header h2 {
+        font-size: 18px;
+    }
+
+    .bk-route {
+        font-size: 15px;
+        margin-bottom: 12px;
+    }
+
+    .bk-meta {
+        font-size: 13px;
+        gap: 10px;
+    }
+
+    .bk-price {
+        font-size: 16px;
+    }
+
+    .bk-countdown {
+        font-size: 24px;
+    }
+
+    /* Baris atas ditumpuk supaya kode pesanan tidak berdesakan
+       dengan status pill */
+    .bk-pending-row {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .bk-text-right {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    /* Baris bawah tetap berdampingan: tagihan kiri, countdown kanan */
+    .bk-row-bottom {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .bk-row-bottom .bk-text-right {
+        align-items: flex-end;
+        text-align: right;
+    }
+
+    .bk-booking-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .bk-qr {
+        align-self: center;
+    }
+
+    .bk-eticket-btn {
+        width: 100%;
+    }
+
+    /* Filter chip lebih rapat */
+    .bk-filters {
+        gap: 6px;
+    }
+
+    .bk-filter {
+        padding: 5px 12px;
+        font-size: 12px;
+    }
+}
+
+/* ---------- Ponsel kecil (≤380px) ---------- */
+@media (max-width: 380px) {
+    .bk-card {
+        padding: 14px;
+    }
+
+    .bk-countdown {
+        font-size: 20px;
+    }
+
+    .bk-value {
+        font-size: 12px;
+        word-break: break-all;
+    }
+}
+
+/* ============================================
+   Tambahan untuk tiket.css
+   Tempel SEBELUM blok @media RESPONSIVE.
+   ============================================ */
+
+/* Teks instruksi pengganti countdown di kartu pending */
+.bk-note {
+    font-size: 12px;
+    color: var(--bk-text-muted);
+    line-height: 1.5;
+    text-align: right;
+}
+
+/* ---------- Status KEDALUWARSA ---------- */
+
+/* Kartu kedaluwarsa diredupkan supaya jelas tidak aktif lagi */
+.bk-card--expired {
+    background-color: #FAFAFA;
+    border-color: #EDEDF0;
+    box-shadow: none;
+}
+
+.bk-card--expired .bk-airline img,
+.bk-card--expired .bk-meta img {
+    opacity: 0.35;
+    filter: grayscale(1);
+}
+
+.bk-card--expired .bk-route,
+.bk-card--expired .bk-meta {
+    color: var(--bk-text-faint);
+}
+
+.bk-card--expired .bk-leg-toggle {
+    opacity: 0.6;
+}
+
+/* Harga dicoret — tagihan sudah tidak berlaku */
+.bk-price--void {
+    text-decoration: line-through;
+    color: var(--bk-text-faint);
+    font-weight: 600;
+}

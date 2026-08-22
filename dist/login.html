@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TicketPedia</title>
+    <!-- Fixed CSS path -->
+    <link rel="stylesheet" href="./log.css">
+  <script type="module" crossorigin src="/assets/login-DYOLe_Q7.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/pocketbase-BLeLc1eM.js">
+</head>
+<body>
+    <div class="left-panel-bg">
+        <div class="left-content">
+            <span class="left-badge">*</span>
+            <!-- Fixed image path -->
+            <img src="./assets/ticketpedia_image.png" alt="">
+            <div class="left-text-block">
+                <p class="left-subtitle">Selamat Datang kembali.</p>
+                <h2 class="left-title">Masuk dengan akun Anda untuk mengelola reservasi dan riwayat tiket penerbangan.</h2>
+                <div class="left-line"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="right-panel">
+        <div class="brand-header">
+            <div class="title">
+                <!-- Fixed image path -->
+                <img class="ticket" src="./assets/title_head1.png" alt="TicketPedia">
+            </div>
+            <div class="sub">
+                <!-- Fixed image path -->
+                <img src="./assets/Travel-sub1.png" alt="Travel Agency Indonesia">
+            </div>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="identity">Email or Username</label>
+                <input type="text" id="identity" class="form-control" placeholder="gmail@example.com or Panca" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" class="form-control"  required>
+            </div>
+
+            <button type="submit" class="btn-primary">Login</button>
+        </form>
+        
+        <div class="footer-text" style="margin-top: 30px; text-align: center; padding-left: 0;">
+            <!-- Fixed link path -->
+            belum punya akun? <a href="./register.html">Sign Up</a>
+        </div>
+    </div>
+
+    <!-- Fixed script path (removed the leading / and added ./) -->
+</body>
+</html>

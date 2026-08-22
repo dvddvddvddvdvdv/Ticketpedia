@@ -1,0 +1,68 @@
+.selected {
+    position: absolute;
+    left: 0;
+    top: 433%;
+    transform: translateY(-50%);
+    
+    width: 6px;
+    height: 35px;
+    background-color: #128C2E; 
+    
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+a {
+    all: unset;
+    cursor: pointer;
+}
+
+
+.user-UI {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    align-items: center;
+    top: 200px;
+}
+
+.user-UI img{
+    padding-bottom: 20px;
+    width: 120px;
+}
+
+.label {
+    font-weight: 800;
+    font-size: 2.5ch;
+    
+}
+
+.sub-text {
+    color: #666666;
+    font-size: 1.5ch;
+    margin-bottom: 0.1rem;
+}
+
+.vendor-btn {
+  width: 340px;
+  height: 45px;
+  background-color: #10B981; /* Matching the green color from your previous screenshot */
+  color: #ffffff;
+  border: none;
+  border-radius: 4px; /* Adjust if you want rounded corners */
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.vendor-page {
+    display: none;
+}
+
+.user-UI {
+    display: none;
+}

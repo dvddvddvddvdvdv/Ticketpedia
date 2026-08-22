@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicketPedia - Dashboard</title>
+    
+    <!-- Added Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/css/global.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/tab-style/buy.css">
+    <link rel="stylesheet" href="/css/tab-style/tiket.css">
+    <link rel="stylesheet" href="/css/tab-style/bk-summary.css">
+    <link rel="stylesheet" href="/css/cart-bar.css">
+
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="Mid-client-kUbYyZKkX2jWzTbF"></script>
+  <script type="module" crossorigin src="/assets/dashboard-5XAjGI-V.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/pocketbase-BLeLc1eM.js">
+</head>
+<body>
+    <nav>
+        <div class="nav">
+            <div class="icon d-flex flex-column align-items-center gap-2">
+                <img class="title" src="/assets/ticketpedia-CSx89W01.png" alt="TicketPedia Logo">
+                
+                <!-- Added Bootstrap width and padding utilities -->
+                <div class="menu w-100 ps-3 pb-3">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALYAAAATCAYAAAA9IfdZAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAAAhFJREFUeAHtmE1SwkAQhScDBVuOEG+gJxC2/Ckn0JwAPIFwAuUEhBOABRRLcgPZspIjxCVQEF8rocYBVlJGqfdVdTIz3T3ZvOnqjFKEEEIIIYnhyGM0GkWO4wTFYrFgBwyHwwl8+eVyeVGr1eYSa8dEUeSXy2VvMBg0tdZ1xF5JrLGHL2ESg/x7jDulUsmxvuPjOy7W84qQH6LjAcSZhzDzpnM8Hrsiajtps9m0YYXYUqlUy3DnstlsRxGSIGljHMJuYUG8sF6vmxC2rOfMJByCabVaDY7sOYX/EhW4gQr9rAhJAG2M22gj7nq93k7EmF+jInf3krTOIc41zBT+O4TdwoF4FJ8iJAF2woaAA4hxmk6nGzKXXhgClWHfTkLcUyaTeYsNrcit6ZdKLT07WxKSFGbFFnG/oBrfbKd1tCKtQ0kQ/IP8TMaGuD3xLxYLDy9XWhJFyC9j9thqtVr5qMCPWzFeQrABKrhrJ+EAhOatxyHgD/Ez6uGgTNRX3z2VdewZosIraV8kxkjJKUJOxDdhi9DQgnSl1cDUF/FCnK6dFPfYxlJoifSTSqUSYL82hnVYLGw5LHMcoAl8Hip+iPEdXDfweYqQE6DtBVTj/vbdPZZk99iw/rFYCFduVubxXA4A5gVUcLnHfpV8vBvS3uCmxVeE/HekHeHNCSGEEEIIIYT8fZzZbBYpQs4MrQg5Qz4AUVMGHPyAuRMAAAAASUVORK5CYII=" alt="Menu">
+                </div>
+
+                <div class="selection position-relative w-100 d-flex align-items-center">
+                    <div class="selected position-absolute start-0 top-50 translate-middle-y"></div>
+                    <a href="dashboard.html"><img src="/assets/Home_sel-GKW7RmfJ.png" alt="Home"></a>
+                </div>
+                <div class="selection w-100 d-flex align-items-center">
+                    <a href="Settings.html"><img src="/assets/gear-3lDDKsgE.png" alt="Settings"></a>
+                </div>
+                <div class="selection w-100 d-flex align-items-center">
+                    <a href="Account.html"><img src="/assets/profile-Csmb79Yt.png" alt="Profile"></a>
+                </div>
+                <div class="selection w-100 d-flex align-items-center">
+                    <a href="tickets.html"><img src="/assets/tickets-D7CYEdLx.png" alt="Tickets"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="top-nav">
+            <!-- Added Bootstrap flex, height, and padding utilities -->
+            <div class="top-icon d-flex align-items-center h-100 px-4">
+                <img src="/assets/logo-DfTQqG1M.png" alt="">
+                
+                <!-- Added Bootstrap flex-grow to push items to the right -->
+                <div class="diva flex-grow-1"></div>
+                
+                <!-- Added Bootstrap flex utilities -->
+                 <a href="../index.html" class="d-flex align-items-center"><img src="/assets/Fpage-CBnRj-no.png" alt=""></a>
+                <a href="test.html" class="d-flex align-items-center"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAABGCAYAAABxLuKEAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAABTxJREFUeAHtnI912jAQxq9ZoM4EcSYImSDOBGWDMAIbwAawAWQCkglwJgAmMJnAdAL3PvnEU1xIA+jkP83vvYMkLZb9cSfpTrJ/UDgitp7YHVssFolZdmJbed+wrdlS+T0IP0iXhO0B71EUJb1ej2B3d3cUx7Ex/rsxy263M7bdbs37ZrOhNE1pvV7jdwj0xvZCpVCtAlc5YlvyhRfD4bBYLpeFD1arVTGdTgsWt+DjZ9JOTA3HCpIPBgNvYnwmEtphb4NIM2qgQEaQ6+vrfDQaFXmeFyHJsqxAu/BOapBACVvW7/fNCdYJ2ocHURliA6oJeMkE35J2yJwKBKrLe2K21dPTU/CwOQWEF5XeE1MAMAfJJpNJ0QZms1mBvo/PuU+K9NDIYrEo2oQTWkNSwIiCIbKNaInTalEsjjhP5IGYLWtb+BwDX670OT26kAy9e5fAl0zlaBXRmUwwYeoiyN/4+pZ0Bgnise7ZrCZJkpzVGWfz+bzoMvjSpb/5ckiNuhpCVcbjsU0d/knMlnc5hFyQ0kjZIqkKcVX5fczeEqGy9j+AyiF3xPhxVP03t7QZs63YW4ILgxLm6+urOVFb9gzZ9u3tLd7vqawt/8Wgjr4FpUpu+4Mh9kMifc30mHhZyNoKF7jtkHnQUPx6eXkpQoC+hts8OEL1MG8JATr2zwSpGgrfIQYDOaekKswUs0FtMDeSUcAYTgahhBwGFw+D1+JvkvAZw2e08zUJ6b+G7pV2GCF0Tr1QFJpcITUzfCec9kRoXBMn5S9OTTWqn9Usp0o7+8w7gUtrItV7Y+f0F/DmECOWnOc+fxpq9i8Qwl7UJdMByYhNaGl5jdvPYOZr1pS1wLqzhWs7dC68KmHe7WRQg4eHB7wZMSDMz5ubG9ICi/KmNRb/khmt+3ks8GsgmwvMC4S5xZRYC3sRPqb51rOxE0IDOUfzYjyGIW3crR6XHgPhpIUV56ps7/KT7hpX9M1BvoU5AoTZacasxrE1z9cCYX4zpAEnjftRiWfXdCkoYgEc8/n5mTSQEc+8rLSSM1teQOnA9zE10hg3kYTHbOwkzDfWWzgVIF9Yz9OYy4gO5gXCbJVnkl4vwh5LY4rBeR3eTAcGYdZaM0k7U0Vf46MNHMPmXhr5nXhMihesEmCCx+GVk29wEY+Pj+ZnzCi5ZHB2agCv5ux3LzC+Xd+rCff392gHJ5zav221KnjYlkZfrO9+1VDZ882hCh6YahaATi2AHzLUYXAMrS8QYlO5Ff8D6lU8C74ZW/i2lT1cNKYMMFvjRWHK/r8QqwRYrqEj+4Pz0Ht23ZIl6q1u4TvkuThVxoND3TjEEkoV2Y/7wULv4pIwmrliuGvXZnRCbx+6DIHR6+3tzfyM8qKP9OEUUKjj0e7DaFRlHnrduG7EW9J/iRdrVuGbiKwlJfQFpnX0NXVwbFn2GOhg8qbdVeIbZ4UzphMY+iwVNBGZQ43pDBZdDSkJoYzOBCHVuW2tMplDThTTBXTiBguL0694uX9p0IVd4o4oY/LIsM3iaIliGbdRHG1RLIM23f6HvjGEKJaYLWt6ToUhOcSNoofEWTQxtJxq4YpqvGsf+9WM9zQh8YSXSLFrTA0gZpvDe+qaDKJ0IH1JSg18+EVMIhA8SDvE4KFoxxEkoYYTs83ZMsQ6vMiXSBADx8NxpWNFVT8hBbSfONQX+8XZemSfOGQ3Gn62KfL9/d1s98BCG0yeOmQfzQRB5qT4aCZtYVywpppQ6VH2OVVR9VFMQFYbcdHvVN5DZC2lQIQU5hjVh3eBLdXMH1Ohe9LiVxcPAAAAAElFTkSuQmCC" alt=""></a>
+                <a href="#" class="d-flex align-items-center"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAABGCAYAAABxLuKEAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAOdEVYdFNvZnR3YXJlAEZpZ21hnrGWYwAABRhJREFUeAHtnO1x4jAQhjeZ+39OBSgVxKkgTgVHByEdkAogFUAqCFcBSQVwFQAVmFQAV4FvX3mVUTyBBCzJH9wzsxAY4o/Xu9JqJfuMwhGxxWJXbEosEjNsxdbyvmJbss3lcxDOyC8J2w3eoyhK4jgm2NXVFSmltPH32gzb7Vbber3W76vViubzOS2XS3yGQH/YXigXqlHgLAdsMz7xrN/vZ7PZLHPBYrHIxuNxxuJmvP1U9qOo5hhBNr1ez5kY+0TCftjbINIz1VAgLcjFxcVmMBhkm80mC0maphn2C++kGgmUsKXdblcfYJVg//AgykOsRxUBLxnhKvkOmUOBQFV5j2Jb3N3dBQ+bQ0B4Ue49igKAHCQdjUZZE3h+fs7Q9vExd8kjMXYynU6zJmGFVp88oEVBF9lEfInTaFEMljh35ADFljYtfHaBiyttTkwlSdG6twlcZMp7q4iOZISEqY1g/MbnN6MjSBCPVWezPkmS5KjGOJ1MJlmbwUWX9ubbITVoawgVGQ6HZujwJYpt0+YQssGQRsoWSVGI88LnIXtLhMraKYDKITfE+HOw73eKTshbDJbXfMhtbI9JTslbDJbX9Hb9Jq1bbSUU8Bo+/w89lJkliNlTFhxG5AJT3fcNrjZmHFxwe3uL2YhbKsw+jJENukCyymDmKhHF7ANZXbfxmAWHUczZIJXh4eGBeAf6SnIdmHyDuSfMOaFd5AHih/mpQ4GXc8KHCb0L812EVrksEqf6CoYseUoBPHORqUtZQvdO6JVizA6WBYpTvrFSV+5Qbm5u9Du8pywSMfrFmTCGkKK4RnTQrTmESVwK02TE+95D6Wen0yHfoDu8vr5+D7lDeHx8pMvLy6P+9xDE2/ULhLnETkOAFQsQ6JAThCg8CqYQSNavX7THMOQbLinqGIY46Na/gxEFB8zpRJD2y4gDYaIQO8Q+cHIQh7tWur+/3/t7iGeLEnoMd04BMeLgJPeJg++RKFYlCggqDCiKUwwriILvqxQF/CCdm22jkPmHOWk0xPAMNMZIriCISfGrFAXAY/4yFBr75CEIp/ZaFLRBVYoiGfQaHsNDm00nRC5TBCePUsfLywu9vb3pEkLZgWwZJI3QLxCGSyeruMrsN8RI/DtIDUm/IJTWyC3+QySFOu0xEGbpYmTaBsRj5uazs3oMtgMLNdOAfcpUa8btVFYWWT+cQBRTwVtzT9Ap2/Ch6zV5SYhexawiR/uICl7ZbRUreGCM6UoXYN2bVMK8G7zT1dpiHDflS/E/kMAlTxmsVaYdc0ubU51XQpsoXvie/ttjpafX11c6RZBxMxPacduP7p3qvKjZF9ImJrYYtsdgMPn76emJTgmM0ziPwz1Q832/U6fmNZ95yy6cTdfWneK07FegZW59D2UtiFZ0AH2kx21GpnaHdATTtoaUhFBKR4KQat2yVknmsEhIUQlacYOFwWpXnFTGem1YJW6JMiSH9Jssji9RDMMmiuNbFEOvSbf/oW0MIYpBsaWuClu+QJcc4kbRz8SZ1jG0cDxSB15QhXftY0m19p46DDzhJbL8fUg1QLFN4D1VJYNWnXlONXz4hSIRCEMJ3yEGD4WnWoIkVHMU5WXCFLEOL3IlEsTA9rBdaVhR1U/IA76fONQV+8Wj9cg8cQiGead9CwkwyY+5Hkwfw+SpQ+bRTBPKRfG2WtG3MDZYNZBQ7lGxvHeKj2ICMmWMk36j/PlUxuYUiJDC7KL48C6wpor5B0KwWWFQtC02AAAAAElFTkSuQmCC" alt=""></a>
+                
+                <!-- Added Bootstrap flex, border-left, and gap utilities -->
+                <div class="user-profile d-flex align-items-center gap-3 border-start border-2 ps-3">
+                    <a href="#"><img class="Profile_picture rounded-circle" src="data:image/png;base64,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" alt=""></a>
+                    
+                    <!-- Added Bootstrap flex column utilities -->
+                    <div class="divs d-flex flex-column justify-content-center">
+                        <p id="navUsername" class="username fw-bold text-dark mb-0">Loading...</p>
+                        <p id="navEmail" class="Email-name mb-0">...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="tab-menu-container">
+            <ul class="tab-list">
+                <li class="tab-link active" data-target="pembelian">Pembelian ticket</li>
+                <li class="tab-divider">|</li>
+                <li class="tab-link" data-target="aktif">booking ticket</li>
+                <li class="tab-divider">|</li>
+                <li class="tab-link" data-target="riwayat">Riwayat Pemesanan</li>
+                <li class="tab-divider">|</li>
+                <li class="tab-link" data-target="pembayaran">Pembayaran &amp; Pengembalian Dana</li>
+            </ul>
+        </div>
+
+        <!-- The Content Sections -->
+        <div id="pembelian" class="tab-content active-content">
+            
+            <!-- Added Bootstrap flexbox, alignment, and border-radius utilities here -->
+            <div class="ticket-controls d-flex align-items-center">
+                <input type="text" class="search-bar border-0 rounded-pill shadow-none" placeholder="Search Bar">
+                
+                <button class="filter-btn border-0 rounded-pill d-flex align-items-center">
+                    Filter 
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                </button>
+                
+                <button class="filter-tag border-0 rounded-pill d-flex align-items-center">Direct</button>
+                <button class="filter-tag border-0 rounded-pill d-flex align-items-center">Transit</button>
+            </div>
+
+            <div class="ticket-list"></div>
+        </div>
+
+        
+        <div id="aktif" class="tab-content">
+            <div class="bk-header">
+                <h2>Informasi Pembookingan</h2>
+                <p>semua ticket yang telah di book</p>
+            </div>
+
+            <!-- ==== ADDED WRAPPER START ==== -->
+            <div class="bk-summary-wrapper">
+                
+                <!-- Ringkasan pembayaran -->
+                <div class="bk-summary">
+                    <div class="bk-summary-main">
+                        <div class="bk-summary-icon">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 9V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2 2 0 0 0 0 6v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2 2 0 0 0 0-6z"></path>
+                                <path d="M15 6v12" stroke-dasharray="2 3"></path>
+                            </svg>
+                        </div>
+                        <div class="bk-summary-info">
+                            <p class="bk-summary-label">Total Pembelian ticket</p>
+                            <p class="bk-summary-total" id="sum-total">Rp 0</p>
+                            <button class="bk-btn-payall" id="btnPayAll">Bayar sepenuhnya</button>
+                        </div>
+                    </div>
+
+                    <div class="bk-summary-side">
+                        <div class="bk-progress-head">
+                            <span>Status pembayaran</span>
+                            <strong id="sum-percent">0% lunas</strong>
+                        </div>
+                        <div class="bk-progress-track">
+                            <div class="bk-progress-fill" id="sum-bar" style="width:0%"></div>
+                        </div>
+                        <div class="bk-progress-legend">
+                            <span><i class="dot dot-paid"></i>Terbayar <b id="sum-paid">Rp 0</b></span>
+                            <span><i class="dot dot-due"></i>Sisa <b id="sum-due">Rp 0</b></span>
+                        </div>
+
+                        <div class="bk-stat-grid">
+                            <div class="bk-stat">
+                                <p class="bk-stat-label">Tiket aktif</p>
+                                <p class="bk-stat-value" id="sum-active">0</p>
+                            </div>
+                            <div class="bk-stat">
+                                <p class="bk-stat-label">Nunggu bayar</p>
+                                <p class="bk-stat-value warn" id="sum-pending">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bk-summary-support">
+                    <div class="bk-support-icon">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.263.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884a9.82 9.82 0 0 1 6.988 2.896 9.82 9.82 0 0 1 2.893 6.994c-.003 5.45-4.437 9.885-9.885 9.885"/>
+                        </svg>
+                    </div>
+                    <div class="bk-support-body">
+                        <p class="bk-support-title">Butuh bantuan?</p>
+                        <p class="bk-support-desc">
+                            Tanya ketersediaan tiket atau kendala pembayaran
+                            langsung ke tim kami.
+                        </p>
+                        <a class="bk-support-btn"
+                            href="https://wa.me/6281234567890?text=Halo%2C%20saya%20butuh%20bantuan%20terkait%20pemesanan%20tiket%20di%20TicketPedia."
+                            target="_blank" rel="noopener">
+                            Hubungi via WhatsApp
+                        </a>
+                        <p class="bk-support-hours">Senin&ndash;Sabtu, 08.00&ndash;20.00 WIB</p>
+                    </div>
+                </div>
+            
+            </div> 
+            <!-- ==== ADDED WRAPPER END ==== -->
+
+            <div class="bk-filters">
+                <button class="bk-filter active" data-status="all">Semua</button>
+                <button class="bk-filter" data-status="pending">Menunggu pembayaran</button>
+                <button class="bk-filter" data-status="paid">Lunas</button>
+                <button class="bk-filter" data-status="failed">Kedaluwarsa</button>
+            </div>
+
+            <div class="bk-list"></div>
+        </div>
+
+        <div id="riwayat" class="tab-content">
+            <h2>Riwayat Pemesanan Content</h2>
+        </div>
+        
+        <div id="pembayaran" class="tab-content">
+            <div class="payment-card-container">
+                <h2 class="section-title">Konfirmasi Pembayaran</h2>
+                
+                <div class="payment-form-grid" style="grid-template-columns: 1fr 1fr;">
+                    <!-- Kolom 1: Informasi Tagihan -->
+                    <div class="form-column">
+                        <div class="input-group">
+                            <label>Booking ID (PNR)</label>
+                            <input type="text" class="booking-input" value="97CMS8" disabled style="background-color: #E9EAEE; cursor: not-allowed;">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>Total Tagihan</label>
+                            <input type="text" class="booking-input" value="Rp 18.450.000" disabled style="background-color: #E9EAEE; cursor: not-allowed;">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Transfer ke Bank *</label>
+                            <select class="booking-input">
+                                <option>Pilih Bank Tujuan</option>
+                                <option>BCA - 1234567890 (a.n TicketPedia)</option>
+                                <option>Mandiri - 0987654321 (a.n TicketPedia)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-column">
+                        <div class="input-group">
+                            <label>Nama Pengirim / Rekening Asal *</label>
+                            <input type="text" class="booking-input" placeholder="Masukkan nama pemilik rekening">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Tanggal Transfer *</label>
+                            <input type="date" class="booking-input">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Bukti Pembayaran (.jpg, .pdf) *</label>
+                            <input type="file" class="file-input" accept=".jpg,.pdf">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="payment-footer">
+                    <button class="btn-submit-payment" onclick="submitPayment()">Kirim Konfirmasi</button>
+                </div>
+            </div>
+        </div>
+        <div id="cart-bar"></div>
+    </main>
+
+</body>
+</html>

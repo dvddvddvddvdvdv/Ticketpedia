@@ -1,0 +1,292 @@
+/* --- LOAD FONTS --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@font-face {
+    font-family: 'SF Pro Display';
+    src: url('../fonts/SF-Pro-Display-Regular.otf') format('opentype');
+    font-weight: 400; 
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'SF Pro Display';
+    src: url('../fonts/SF-Pro-Display-Bold.otf') format('opentype');
+    font-weight: 700; 
+    font-style: normal;
+}
+
+body {
+    background-color: #E9EAEE !important;
+    font-family: 'Inter', system-ui, sans-serif; 
+}
+
+/* --- LAYOUT VARIABLES --- */
+:root {
+    --spacing: 12px;          
+    --sidebar-width: 210px;
+    --top-nav-height: 120px; 
+}
+
+/* --- CORE LAYOUT STRUCTURE --- */
+.nav {
+    position: fixed;
+    top: var(--spacing);
+    left: var(--spacing);
+    bottom: var(--spacing);
+    width: var(--sidebar-width);
+    padding-top: 40px;
+    background-color: #F6F7F8;
+    border-radius: 10px;
+}
+
+.top-nav {
+    /* CHANGED: Absolute positioning allows it to scroll away with the page content */
+    position: absolute; 
+    top: var(--spacing);
+    left: calc(var(--sidebar-width) + var(--spacing) * 2);
+    right: var(--spacing);
+    height: var(--top-nav-height);
+    background-color: #F6F7F8;
+    border-radius: 10px;
+    z-index: 9999;
+}
+
+main {
+    margin-left: calc(var(--sidebar-width) + var(--spacing) * 2);
+    padding-top: calc(var(--top-nav-height) + var(--spacing) * 2);
+    padding-right: var(--spacing);
+}
+
+/* --- CUSTOM COMPONENT SIZING & COLORS --- */
+.title {
+    padding-bottom: 30px;
+    width: 80%;
+}
+
+.menu img {
+    width: 88%;
+}
+
+.selection {
+    cursor: pointer;
+    padding: 2px 0; 
+}
+
+.selection img {
+    padding-left: 30px; 
+    width: 75%;
+}
+
+.top-nav img {
+    width: 80px; 
+}
+
+.top-icon > a {
+    margin-right: 20px;
+}
+
+.top-icon > a img {
+    width: 60px;
+}
+
+.user-profile {
+    border-color: #E9EAEE !important; /* Overrides Bootstrap's default gray border */
+}
+
+.user-profile a img {
+    width: 60px;
+}
+
+.username {
+    font-size: 2.5ch;
+}
+
+.Email-name {
+    font-size: 2ch;
+    color: #9C9B9B;
+}
+
+/* ============================================
+   RESPONSIVE — global layout
+   Tempel di AKHIR global.css.
+   Desktop (>900px) tidak berubah sama sekali.
+   ============================================ */
+
+/* ---------- Tablet (≤900px) ----------
+   Sidebar tetap di kiri, hanya diciutkan jadi ikon saja. */
+@media (max-width: 900px) {
+    :root {
+        --sidebar-width: 82px;
+        --top-nav-height: 88px;
+    }
+
+    .nav {
+        padding-top: 24px;
+    }
+
+    .title,
+    .menu {
+        display: none;
+    }
+
+    .selection img {
+        padding-left: 0;
+        width: 46%;
+    }
+
+    .nav .icon {
+        gap: 18px !important;
+    }
+
+    .top-nav img {
+        width: 60px;
+    }
+
+    .top-icon > a {
+        margin-right: 12px;
+    }
+
+    .top-icon > a img {
+        width: 42px;
+    }
+
+    .user-profile a img {
+        width: 46px;
+    }
+
+    .username {
+        font-size: 14px;
+    }
+
+    .Email-name {
+        font-size: 12px;
+    }
+}
+
+/* ---------- Ponsel (≤640px) ----------
+   Sidebar pindah ke bawah jadi bottom navigation. */
+@media (max-width: 640px) {
+    :root {
+        --sidebar-width: 0px;
+        --top-nav-height: 64px;
+        --bottom-nav-height: 62px;
+    }
+
+    /* --- Sidebar → bottom bar --- */
+    .nav {
+        top: auto;
+        bottom: var(--spacing);
+        left: var(--spacing);
+        right: var(--spacing);
+        width: auto;
+        height: var(--bottom-nav-height);
+        padding-top: 0;
+        z-index: 10000;
+        box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* .icon pakai Bootstrap .flex-column — perlu !important untuk dibalik */
+    .nav .icon {
+        flex-direction: row !important;
+        justify-content: space-around;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        gap: 0 !important;
+    }
+
+    .title,
+    .menu {
+        display: none;
+    }
+
+    .selection {
+        flex: 1;
+        width: auto !important;
+        justify-content: center;
+        padding: 0;
+    }
+
+    .selection img {
+        padding-left: 0;
+        width: auto;
+        max-height: 26px;
+    }
+
+    /* Indikator halaman aktif disembunyikan — posisinya dirancang
+       untuk sidebar vertikal, tidak cocok di bottom bar */
+    .selection .selected {
+        display: none;
+    }
+
+    /* --- Top nav --- */
+    .top-nav {
+        left: var(--spacing);
+    }
+
+    .top-icon {
+        padding: 0 14px !important;
+    }
+
+    .top-nav img {
+        width: 46px;
+    }
+
+    .top-icon > a {
+        margin-right: 8px;
+    }
+
+    .top-icon > a img {
+        width: 30px;
+    }
+
+    .user-profile {
+        gap: 8px !important;
+        padding-left: 10px !important;
+    }
+
+    .user-profile a img {
+        width: 34px;
+    }
+
+    .username {
+        font-size: 12px;
+        max-width: 90px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .Email-name {
+        display: none;
+    }
+
+    /* --- Main content --- */
+    main {
+        margin-left: 0;
+        padding-left: var(--spacing);
+        padding-right: var(--spacing);
+        /* ruang untuk bottom nav */
+        padding-bottom: calc(var(--bottom-nav-height) + var(--spacing) * 2);
+    }
+
+    /* Cart bar naik supaya tidak tertutup bottom nav */
+    #cart-bar {
+        bottom: calc(var(--bottom-nav-height) + var(--spacing) * 2);
+    }
+}
+
+/* ---------- Ponsel kecil (≤400px) ---------- */
+@media (max-width: 400px) {
+    .top-icon > a:not(:last-of-type) {
+        display: none;
+    }
+
+    .username {
+        max-width: 70px;
+    }
+
+    .selection img {
+        max-height: 23px;
+    }
+}

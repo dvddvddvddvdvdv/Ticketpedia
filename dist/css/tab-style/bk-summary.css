@@ -1,0 +1,305 @@
+/* ============================================
+   Ringkasan pembayaran — kartu di atas filter
+   Tempel di tiket.css, SEBELUM blok RESPONSIVE
+   Memakai variabel yang sudah ada di :root
+   ============================================ */
+
+/* Wrapper baru untuk menjajarkan Ringkasan & WA Support */
+.bk-summary-wrapper {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 20px;
+    align-items: stretch;
+}
+
+.bk-summary {
+    flex: 0.8; 
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 24px;
+    padding: 20px 24px;
+    background-color: #FFFFFF;
+    border: 1px solid var(--bk-border);
+    border-radius: var(--bk-radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ---------- Kolom kiri: total & CTA ---------- */
+
+.bk-summary-main {
+    display: flex;
+    gap: 14px;
+    justify-content: flex-start;
+    padding-right: 1px;
+    border-right: 1px solid var(--bk-border);
+}
+
+.bk-summary-icon {
+    flex: 0 0 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bk-success-bg);
+    color: var(--bk-success-text);
+    border-radius: 50%;
+}
+
+.bk-summary-label {
+    margin: 0 0 4px;
+    font-size: 12px;
+    color: var(--bk-text-muted);
+}
+
+.bk-summary-total {
+    margin: 0 0 12px;
+    font-size: 35px;
+    font-weight: 700;
+    color: var(--bk-text);
+    letter-spacing: -0.5px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Diubah menyerupai style hijau di Figma */
+.bk-btn-payall {
+    width: 100%;
+    padding: 10px 18px;
+    background-color: #1DA851; 
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.bk-btn-payall:hover:not(:disabled) {
+    background-color: #14803d;
+}
+
+.bk-btn-payall:disabled {
+    background-color: var(--bk-disabled);
+    cursor: not-allowed;
+}
+
+/* ---------- Kolom kanan: progres & statistik ---------- */
+
+.bk-progress-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: var(--bk-text-muted);
+}
+
+.bk-progress-head strong {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bk-text);
+}
+
+.bk-progress-track {
+    height: 6px;
+    margin-bottom: 10px;
+    background-color: var(--bk-neutral-bg);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.bk-progress-fill {
+    height: 100%;
+    background-color: var(--bk-success-text);
+    border-radius: 999px;
+    transition: width 0.4s ease;
+}
+
+.bk-progress-legend {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--bk-text-muted);
+}
+
+.bk-progress-legend b {
+    font-weight: 600;
+    color: var(--bk-text);
+}
+
+.bk-progress-legend .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: 6px;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.dot-paid {
+    background-color: var(--bk-success-text);
+}
+
+.dot-due {
+    background-color: var(--bk-border-strong);
+}
+
+.bk-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.bk-stat {
+    padding: 10px 12px;
+    background-color: var(--bk-neutral-bg);
+    border-radius: var(--bk-radius-sm);
+}
+
+.bk-stat-label {
+    margin: 0 0 3px;
+    font-size: 11px;
+    color: var(--bk-text-muted);
+}
+
+.bk-stat-value {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--bk-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.bk-stat-value.warn {
+    color: var(--bk-warning-text);
+}
+
+/* ---------- Kartu bantuan (terpisah dari ringkasan) ---------- */
+
+.bk-summary-support {
+    display: flex;
+    gap: 14px;
+    flex: 0 0 320px; /* Diperlebar sedikit agar porsi teks pas dengan Figma */
+    padding: 18px;
+    background: #F0FDF4;
+    border: 1px solid #BBF7D0;
+    border-radius: 12px;
+}
+
+.bk-support-icon {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border-radius: 50%;
+    color: #25D366;
+}
+
+.bk-support-body {
+    min-width: 0;
+}
+
+.bk-support-title {
+    margin: 0 0 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #14532D;
+}
+
+.bk-support-desc {
+    margin: 0 0 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #3F6212;
+}
+
+.bk-support-btn {
+    display: inline-block;
+    padding: 9px 16px;
+    background: #25D366;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #FFFFFF;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.bk-support-btn:hover {
+    background: #1DA851;
+    color: #FFFFFF;
+}
+
+.bk-support-hours {
+    margin: 10px 0 0;
+    font-size: 11px;
+    color: #6B7280;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1040px) {
+    /* Tumpuk seluruh wrapper di layar menengah */
+    .bk-summary-wrapper {
+        flex-direction: column;
+    }
+
+    .bk-summary {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .bk-summary-main {
+        padding-right: 0;
+        padding-bottom: 20px;
+        border-right: none;
+        border-bottom: 1px solid var(--bk-border);
+    }
+}
+
+@media (max-width: 900px) {
+    .bk-summary-support {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 640px) {
+    .bk-summary {
+        padding: 16px;
+    }
+
+    .bk-summary-total {
+        font-size: 22px;
+    }
+
+    .bk-progress-legend {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .bk-stat-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .bk-stat {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        padding: 8px 12px;
+    }
+
+    .bk-stat-label {
+        margin: 0;
+    }
+
+    .bk-stat-value {
+        font-size: 15px;
+    }
+}

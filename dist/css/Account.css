@@ -1,0 +1,13 @@
+.selected {
+    position: absolute;
+    left: 0;
+    top: 307%;
+    transform: translateY(-50%);
+    
+    width: 6px;
+    height: 35px;
+    background-color: #128C2E; 
+    
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}

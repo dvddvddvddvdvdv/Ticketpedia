@@ -1,0 +1,1 @@
+import{p as e}from"./pocketbase-BLeLc1eM.js";if(e.authStore.isValid&&e.authStore.model){const t=e.authStore.model,o=document.querySelector("#navUsername"),n=document.querySelector("#navEmail");o&&(o.textContent=t.username||"User"),n&&(n.textContent=t.email||"")}else window.location.href="../login.html";
