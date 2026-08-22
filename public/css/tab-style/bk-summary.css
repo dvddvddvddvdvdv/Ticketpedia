@@ -13,7 +13,7 @@
 }
 
 .bk-summary {
-    flex: 0.8; 
+    flex:  1; 
     display: grid;
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     gap: 24px;
@@ -181,7 +181,7 @@
 .bk-summary-support {
     display: flex;
     gap: 14px;
-    flex: 0 0 320px; /* Diperlebar sedikit agar porsi teks pas dengan Figma */
+    flex: 0 0 500px; /* Diperlebar sedikit agar porsi teks pas dengan Figma */
     padding: 18px;
     background: #F0FDF4;
     border: 1px solid #BBF7D0;
