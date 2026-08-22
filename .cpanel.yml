@@ -1,5 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DIRPATH=/home/wnjid1/public_html
+    - export DIRPATH=/home/wnjid1/ticketpedia.biz.id
     - /bin/cp -R * $DIRPATH
