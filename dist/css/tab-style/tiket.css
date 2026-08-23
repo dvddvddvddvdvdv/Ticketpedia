@@ -431,6 +431,48 @@
     background: transparent;
 }
 
+.bk-expired-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.bk-rebook,
+.bk-delete {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.bk-rebook {
+    background-color: var(--bk-accent-blue);
+    color: #FFFFFF;
+}
+
+.bk-rebook:hover:not(:disabled) {
+    background-color: var(--bk-accent-blue-hover);
+}
+
+.bk-delete {
+    background-color: #F8D7DA;
+    color: #721C24;
+}
+
+.bk-delete:hover:not(:disabled) {
+    background-color: #F1AEB5;
+}
+
+.bk-delete:disabled {
+    background-color: var(--bk-disabled);
+    color: var(--bk-text-faint);
+    cursor: not-allowed;
+}
+
 /* ---------- Kosong ---------- */
 
 .bk-empty {

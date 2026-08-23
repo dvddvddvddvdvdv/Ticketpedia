@@ -27,8 +27,24 @@
 
 
 .ticket-card:hover, .ticket-card.selected {
-    border-color: #2E79C1; 
+    border-color: #2E79C1;
     box-shadow: 0 4px 12px rgba(46, 121, 193, 0.15);
+}
+
+/* Menyorot kartu tiket saat pengguna kembali lewat "Pesan Lagi" */
+.ticket-highlight .ticket-card {
+    animation: ticket-pulse 1.6s ease;
+}
+
+@keyframes ticket-pulse {
+    0%, 100% {
+        border-color: transparent;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+    }
+    25% {
+        border-color: #2E79C1;
+        box-shadow: 0 0 0 4px rgba(46, 121, 193, 0.25);
+    }
 }
 
 /* Airline Branding */

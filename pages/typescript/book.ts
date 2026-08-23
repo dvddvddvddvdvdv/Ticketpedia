@@ -318,6 +318,8 @@ function cardHTML(b: any): string {
     }
 
     if (status === 'failed') {
+        const flightId = esc(f.id || '');
+
         return `
         <div class="bk-card bk-card--expired" data-id="${esc(b.id)}">
             ${airlineBlock}
@@ -340,7 +342,10 @@ function cardHTML(b: any): string {
                         <span class="bk-price bk-price--void">${formatRupiah(amount)}</span>
                     </div>
                 </div>
-                <button class="bk-pay bk-pay--expired" disabled>Kedaluwarsa</button>
+                <div class="bk-expired-actions">
+                    <button class="bk-rebook" type="button" data-flight-id="${flightId}">Pesan Lagi</button>
+                    <button class="bk-delete" type="button" data-booking-id="${esc(b.id)}">Hapus</button>
+                </div>
             </div>
         </div>`;
     }
@@ -560,6 +565,52 @@ document.addEventListener('click', async (ev) => {
         } catch (err) {
             alert(err instanceof Error ? err.message : 'Terjadi kesalahan.');
             resetSingleBtn();
+        }
+        return;
+    }
+
+    // Pesan lagi — kembali ke tab Pembelian Tiket dan sorot penerbangan yang
+    // sama, supaya harga/kursi tersedia dicek ulang lewat alur normal
+    // (bukan membuat pesanan baru diam-diam dari sini).
+    const rebookBtn = target.closest('.bk-rebook') as HTMLButtonElement | null;
+    if (rebookBtn) {
+        const flightId = rebookBtn.dataset.flightId;
+        const pembelianTab = document.querySelector('[data-target="pembelian"]') as HTMLElement | null;
+        pembelianTab?.click();
+
+        if (flightId) {
+            setTimeout(() => {
+                const wrapper = document.querySelector(`.ticket-wrapper[data-flight-id="${flightId}"]`);
+                if (wrapper) {
+                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    wrapper.classList.add('ticket-highlight');
+                    setTimeout(() => wrapper.classList.remove('ticket-highlight'), 1600);
+                }
+            }, 150);
+        }
+        return;
+    }
+
+    // Hapus pesanan yang sudah kedaluwarsa dari daftar
+    const deleteBtn = target.closest('.bk-delete') as HTMLButtonElement | null;
+    if (deleteBtn) {
+        const bookingId = deleteBtn.dataset.bookingId;
+        if (!bookingId) return;
+        if (!confirm('Hapus pesanan ini dari daftar? Tindakan ini tidak bisa dibatalkan.')) return;
+
+        deleteBtn.disabled = true;
+        deleteBtn.textContent = 'Menghapus…';
+
+        try {
+            await pb.collection('bookings').delete(bookingId);
+            allBookings = allBookings.filter(b => b.id !== bookingId);
+            renderBookings();
+            renderSummary(allBookings);
+        } catch (err) {
+            console.error('Gagal menghapus pesanan:', err);
+            alert('Gagal menghapus pesanan. Silakan coba lagi.');
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = 'Hapus';
         }
         return;
     }
