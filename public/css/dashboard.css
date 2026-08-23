@@ -1,17 +1,3 @@
-.selected {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    
-    width: 6px;
-    height: 35px;
-    background-color: #128C2E; 
-    
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
-}
-
 /* --- TICKET CONTROLS (SEARCH & FILTERS) --- */
 .ticket-controls {
     display: flex;
@@ -27,6 +13,7 @@
     padding: 12px 20px;
     border-radius: 30px;
     width: 250px;
+    max-width: 100%;
     font-size: 15px;
     font-family: inherit;
     color: #333;
@@ -52,4 +39,9 @@
     transition: background-color 0.2s;
 }
 
+@media (max-width: 640px) {
+    .search-bar {
+        width: 100%;
+    }
+}
 

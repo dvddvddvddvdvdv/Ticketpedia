@@ -13,7 +13,7 @@
 }
 
 .bk-summary {
-    flex:  1; 
+    flex:  1Z; 
     display: grid;
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
     gap: 24px;
@@ -64,10 +64,10 @@
 .bk-btn-payall {
     width: 100%;
     padding: 10px 18px;
-    background-color: #1DA851; 
+    background-color: #1DA851;
     color: #FFFFFF;
     border: none;
-    border-radius: 8px;
+    border-radius: 999px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -185,7 +185,7 @@
     padding: 18px;
     background: #F0FDF4;
     border: 1px solid #BBF7D0;
-    border-radius: 12px;
+    border-radius: 16px;
 }
 
 .bk-support-icon {
@@ -222,7 +222,7 @@
     display: inline-block;
     padding: 9px 16px;
     background: #25D366;
-    border-radius: 8px;
+    border-radius: 999px;
     font-size: 13px;
     font-weight: 600;
     color: #FFFFFF;

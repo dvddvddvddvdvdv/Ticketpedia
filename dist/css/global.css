@@ -1,30 +1,38 @@
 /* --- LOAD FONTS --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-@font-face {
-    font-family: 'SF Pro Display';
-    src: url('../fonts/SF-Pro-Display-Regular.otf') format('opentype');
-    font-weight: 400; 
-    font-style: normal;
+* {
+    box-sizing: border-box;
 }
 
-@font-face {
-    font-family: 'SF Pro Display';
-    src: url('../fonts/SF-Pro-Display-Bold.otf') format('opentype');
-    font-weight: 700; 
-    font-style: normal;
+html {
+    scroll-behavior: smooth;
 }
 
 body {
     background-color: #E9EAEE !important;
-    font-family: 'Inter', system-ui, sans-serif; 
+    font-family: 'Inter', system-ui, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
 }
 
 /* --- LAYOUT VARIABLES --- */
 :root {
-    --spacing: 12px;          
+    --spacing: 12px;
     --sidebar-width: 210px;
-    --top-nav-height: 120px; 
+    --top-nav-height: 120px;
+    --radius-card: 16px;
+    --radius-pill: 999px;
+    --shadow-card: 0 2px 8px rgba(16, 24, 40, 0.06);
+    --shadow-card-hover: 0 8px 24px rgba(16, 24, 40, 0.06);
 }
 
 /* --- CORE LAYOUT STRUCTURE --- */
@@ -36,18 +44,18 @@ body {
     width: var(--sidebar-width);
     padding-top: 40px;
     background-color: #F6F7F8;
-    border-radius: 10px;
+    border-radius: var(--radius-card);
 }
 
 .top-nav {
     /* CHANGED: Absolute positioning allows it to scroll away with the page content */
-    position: absolute; 
+    position: absolute;
     top: var(--spacing);
     left: calc(var(--sidebar-width) + var(--spacing) * 2);
     right: var(--spacing);
     height: var(--top-nav-height);
     background-color: #F6F7F8;
-    border-radius: 10px;
+    border-radius: var(--radius-card);
     z-index: 9999;
 }
 
@@ -69,12 +77,70 @@ main {
 
 .selection {
     cursor: pointer;
-    padding: 2px 0; 
+    padding: 6px 10px;
+    margin: 0 8px;
+    border-radius: 12px;
+    transition: background-color 0.15s ease;
 }
 
-.selection img {
-    padding-left: 30px; 
-    width: 75%;
+.nav-home     { --nav-color: #2E79C1; --nav-color-soft: rgba(46, 121, 193, 0.1); }
+.nav-settings { --nav-color: #D97706; --nav-color-soft: rgba(217, 119, 6, 0.1); }
+.nav-profile  { --nav-color: #4338CA; --nav-color-soft: rgba(67, 56, 202, 0.1); }
+.nav-tickets  { --nav-color: #1B5E20; --nav-color-soft: rgba(27, 94, 32, 0.1); }
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    text-decoration: none;
+    color: inherit;
+}
+
+.nav-badge {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #EEF0F3;
+    color: #9C9B9B;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.nav-badge svg {
+    width: 20px;
+    height: 20px;
+}
+
+.nav-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #6B7280;
+    white-space: nowrap;
+    transition: color 0.15s ease;
+}
+
+.selection.active {
+    background-color: var(--nav-color-soft);
+}
+
+.selection.active .nav-badge {
+    background-color: var(--nav-color);
+    color: #FFFFFF;
+}
+
+.selection.active .nav-label {
+    color: var(--nav-color);
+    font-weight: 700;
 }
 
 .top-nav img {
@@ -129,13 +195,31 @@ main {
         display: none;
     }
 
-    .selection img {
-        padding-left: 0;
-        width: 46%;
+    .selection {
+        margin: 0 4px;
+        padding: 6px;
+    }
+
+    .nav-link {
+        justify-content: center;
+    }
+
+    .nav-label {
+        display: none;
+    }
+
+    .nav-badge {
+        width: 32px;
+        height: 32px;
+    }
+
+    .nav-badge svg {
+        width: 16px;
+        height: 16px;
     }
 
     .nav .icon {
-        gap: 18px !important;
+        gap: 10px !important;
     }
 
     .top-nav img {
@@ -185,7 +269,6 @@ main {
         box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
     }
 
-    /* .icon pakai Bootstrap .flex-column — perlu !important untuk dibalik */
     .nav .icon {
         flex-direction: row !important;
         justify-content: space-around;
@@ -193,6 +276,11 @@ main {
         width: 100%;
         height: 100%;
         gap: 0 !important;
+        padding-inline: 8px;
+    }
+
+    .top-nav {
+        right: var(--spacing);
     }
 
     .title,
@@ -204,19 +292,36 @@ main {
         flex: 1;
         width: auto !important;
         justify-content: center;
-        padding: 0;
+        padding: 4px 2px;
+        margin: 0;
+        border-radius: 10px;
     }
 
-    .selection img {
-        padding-left: 0;
-        width: auto;
-        max-height: 26px;
+    .nav-link {
+        flex-direction: column;
+        gap: 2px;
+        justify-content: center;
     }
 
-    /* Indikator halaman aktif disembunyikan — posisinya dirancang
-       untuk sidebar vertikal, tidak cocok di bottom bar */
-    .selection .selected {
-        display: none;
+    .nav-label {
+        display: block;
+        font-size: 10px;
+        font-weight: 600;
+        color: #9C9B9B;
+    }
+
+    .selection.active .nav-label {
+        color: var(--nav-color);
+    }
+
+    .nav-badge {
+        width: 30px;
+        height: 30px;
+    }
+
+    .nav-badge svg {
+        width: 16px;
+        height: 16px;
     }
 
     /* --- Top nav --- */
@@ -286,7 +391,12 @@ main {
         max-width: 70px;
     }
 
-    .selection img {
-        max-height: 23px;
+    .nav-badge {
+        width: 26px;
+        height: 26px;
+    }
+
+    .nav-label {
+        font-size: 9px;
     }
 }

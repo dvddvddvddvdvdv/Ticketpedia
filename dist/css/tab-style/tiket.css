@@ -25,8 +25,8 @@
     --bk-danger: #DC2626;
     --bk-disabled: #D1D5DB;
 
-    --bk-radius: 12px;
-    --bk-radius-sm: 6px;
+    --bk-radius: 16px;
+    --bk-radius-sm: 8px;
     --bk-card-height: 290px;
 }
 
@@ -404,7 +404,7 @@
     background-color: var(--bk-accent-blue);
     color: #FFFFFF;
     border: none;
-    border-radius: 8px;
+    border-radius: 999px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;

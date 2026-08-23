@@ -11,7 +11,7 @@
 
 .ticket-card {
     background-color: #FFFFFF;
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 10px 20px;
     display: flex;
     align-items: center;
@@ -109,38 +109,67 @@
     padding-top: 3%;
     padding-left: 1%;
     width: 100%;
-    border-bottom: 2px solid #CFCFCF; 
-    padding-bottom: 30px; 
+    border-bottom: 2px solid #CFCFCF;
+    padding-bottom: 24px;
 }
 
 /* --- TAB LIST LAYOUT --- */
 .tab-list {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     list-style: none;
     margin: 0;
     padding: 0;
-    gap: 30px;
+    gap: 32px;
 }
 
-/* --- TAB TEXT (INACTIVE) --- */
+/* --- TAB ITEM (ICON BADGE + LABEL) --- */
 .tab-link {
-    font-size: 20px;
-    font-weight: 580;
-    color: #9C9B9B;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
     cursor: pointer;
-    transition: color 0.2s ease-in-out;
 }
 
-/* --- TAB TEXT (ACTIVE STATE) --- */
-.tab-link.active {
-    color: #4CA764;
-}
-
-/* --- VERTICAL DIVIDERS --- */
-.tab-divider {
+.tab-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #F3F4F6;
     color: #9C9B9B;
-    user-select: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.tab-badge svg {
+    width: 22px;
+    height: 22px;
+}
+
+.tab-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6B7280;
+    text-align: center;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+}
+
+.tab-buy .tab-badge     { --tab-color: #2E79C1; }
+.tab-booking .tab-badge { --tab-color: #1B5E20; }
+.tab-history .tab-badge { --tab-color: #6B7280; }
+.tab-payment .tab-badge { --tab-color: #D97706; }
+
+.tab-link.active .tab-badge {
+    background-color: var(--tab-color, #2E79C1);
+    color: #FFFFFF;
+}
+
+.tab-link.active .tab-label {
+    color: var(--tab-color, #2E79C1);
 }
 
 /* --- TAB CONTENT SECTIONS --- */
@@ -213,7 +242,7 @@
     color: #FFFFFF;
     border: none;
     padding: 12px 40px;
-    border-radius: 8px;
+    border-radius: 999px;
     font-size: 15px;
     font-family: inherit;
     font-weight: 700;
@@ -247,7 +276,7 @@
     color: #FFFFFF;
     border: none;
     padding: 12px 44px;
-    border-radius: 8px;
+    border-radius: 999px;
     font-size: 15px;
     font-family: inherit;
     font-weight: 700;
@@ -271,7 +300,7 @@
 /* --- ACTIVE TICKET CARD CONTAINER --- */
 .active-ticket-card {
     background-color: #FFFFFF;
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
     border: 2px solid transparent;
@@ -414,7 +443,7 @@
     background-color: #E9EAEE;
     border: none;
     padding: 8px 10px;
-    border-radius: 6px;
+    border-radius: 999px;
     font-size: 12px;
     font-family: inherit;
     font-weight: 600;
@@ -443,18 +472,18 @@
 /* Wrapper to hold the card and the form together */
 .ticket-wrapper {
     background-color: transparent;
-    border-radius: 12px;
+    border-radius: 16px;
     margin-bottom: 15px;
     transition: all 0.2s ease;
 }
 
 /* The booking form container - HIDDEN BY DEFAULT */
 .booking-form {
-    display: none; 
+    display: none;
     padding: 25px;
     background-color: #FFFFFF;
     border-top: 1px dashed #DDE0E5;
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 16px 16px;
     margin-top: -10px; /* Snug up against the card */
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
 }
@@ -464,7 +493,7 @@
     border: 2px solid #2E79C1;
     box-shadow: 0 4px 12px rgba(46, 121, 193, 0.15);
     background-color: #FFFFFF;
-    border-radius: 12px;
+    border-radius: 16px;
 }
 
 /* Show the form ONLY when the wrapper has the 'active-booking' class */
@@ -487,7 +516,7 @@
 /* --- ACTIVE TICKET CARD STYLING (Matching the screenshot) --- */
 .active-ticket-card {
     background-color: #FFFFFF;
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
     border: 2px solid transparent;
@@ -526,7 +555,7 @@
 .booking-input {
     padding: 12px 15px;
     border: 1px solid #DDE0E5;
-    border-radius: 8px;
+    border-radius: 12px;
     font-family: inherit;
     font-size: 14px;
     outline: none;
@@ -559,11 +588,11 @@
 }
 
 .btn-lanjut {
-    background-color: #28a745; 
+    background-color: #28a745;
     color: #FFFFFF;
     border: none;
     padding: 12px 30px;
-    border-radius: 8px;
+    border-radius: 999px;
     font-size: 15px;
     font-family: inherit;
     font-weight: 700;
@@ -588,32 +617,9 @@
     top: 40px;
     background-color: #FFFFFF;
     border-radius: 16px; /* Slightly rounder, more modern corners */
-    padding: 32px;.payment-card-container {
-    background-color: #FFFFFF;
-    border-radius: 16px; /* Slightly rounder, more modern corners */
     padding: 32px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04); 
-    border: 1px solid #E9EAEE; /* Gives the card a clean, defined edge */
-}
-
-.section-title {
-    font-size: 22px; /* Slightly larger for better visual hierarchy */
-    font-weight: 700;
-    color: #1A1D23; /* A rich, dark slate-gray (softer on the eyes than pure #111) */
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px dashed #DDE0E5; /* Adds a nice separator below the title */
-}
-
-.payment-form-grid {
-    display: grid;
-    /* Responsive magic: Stacks to 1 column on phones, expands to 2 or more on desktop automatically */
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
-    align-items: start; /* Prevents inputs from stretching weirdly if column heights differ */
-}
     /* Softer, wider shadow for better depth */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04); 
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
     border: 1px solid #E9EAEE; /* Gives the card a clean, defined edge */
 }
 
@@ -637,9 +643,6 @@
 @media screen and (max-width: 1250px) {
     .tab-list {
         flex-wrap: wrap;
-    }
-    .tab-divider {
-        display: none;
     }
     .ticket-controls {
         flex-wrap: wrap;
@@ -703,8 +706,9 @@
         padding-bottom: 15px;
         margin-bottom: 15px;
     }
-    
+
     .airline-info img {
+        width: 64px;
         margin-bottom: 0;
     }
 }
@@ -712,5 +716,88 @@
 @media screen and (max-width: 1024px) {
     .payment-form-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+/* ---------- Ponsel (≤640px) ---------- */
+@media screen and (max-width: 640px) {
+    .tab-list {
+        gap: 16px;
+    }
+
+    .tab-badge {
+        width: 38px;
+        height: 38px;
+    }
+
+    .tab-badge svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .tab-label {
+        font-size: 11px;
+        white-space: normal;
+        max-width: 70px;
+    }
+
+    .active-ticket-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ticket-main-info {
+        flex-wrap: wrap;
+        row-gap: 12px;
+    }
+
+    .airline-column {
+        width: auto;
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .airline-column img {
+        width: 40px;
+    }
+
+    .flight-info-column {
+        flex-basis: 100%;
+        order: 3;
+    }
+
+    .booking-id-column {
+        min-width: 0;
+    }
+
+    .meta-grid {
+        flex-wrap: wrap;
+        row-gap: 6px;
+    }
+
+    .ticket-actions {
+        flex-wrap: wrap;
+    }
+
+    .form-row {
+        flex-wrap: wrap;
+    }
+
+    .booking-footer {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .btn-lanjut {
+        width: 100%;
+    }
+
+    .payment-card-container {
+        top: 0;
+        padding: 20px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        margin-bottom: 20px;
     }
 }
