@@ -1,0 +1,7 @@
+# Prevent long-lived browser caching of HTML/CSS/JS so deploys always show up
+# without requiring visitors to hard-refresh.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(html|css|js)$">
+        Header set Cache-Control "no-cache, must-revalidate"
+    </FilesMatch>
+</IfModule>
