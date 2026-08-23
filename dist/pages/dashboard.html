@@ -13,11 +13,12 @@
     <link rel="stylesheet" href="/css/tab-style/buy.css">
     <link rel="stylesheet" href="/css/tab-style/tiket.css">
     <link rel="stylesheet" href="/css/tab-style/bk-summary.css">
+    <link rel="stylesheet" href="/css/tab-style/riwayat.css">
     <link rel="stylesheet" href="/css/cart-bar.css">
 
     <script src="https://app.sandbox.midtrans.com/snap/snap.js"
         data-client-key="Mid-client-kUbYyZKkX2jWzTbF"></script>
-  <script type="module" crossorigin src="/assets/dashboard-DQD6y5BL.js"></script>
+  <script type="module" crossorigin src="/assets/dashboard-E_D8K99C.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/pocketbase-BLeLc1eM.js">
 </head>
 <body>
@@ -229,7 +230,12 @@
         </div>
 
         <div id="riwayat" class="tab-content">
-            <h2>Riwayat Pemesanan Content</h2>
+            <div class="riwayat-header">
+                <h2>Riwayat Pemesanan</h2>
+                <p>Semua pesanan yang pernah Anda buat</p>
+            </div>
+
+            <div id="riwayat-list"></div>
         </div>
 
         <div id="pembayaran" class="tab-content">

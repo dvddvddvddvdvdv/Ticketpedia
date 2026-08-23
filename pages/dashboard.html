@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/css/tab-style/buy.css">
     <link rel="stylesheet" href="/css/tab-style/tiket.css">
     <link rel="stylesheet" href="/css/tab-style/bk-summary.css">
+    <link rel="stylesheet" href="/css/tab-style/riwayat.css">
     <link rel="stylesheet" href="/css/cart-bar.css">
 
     <script src="https://app.sandbox.midtrans.com/snap/snap.js"
@@ -227,7 +228,12 @@
         </div>
 
         <div id="riwayat" class="tab-content">
-            <h2>Riwayat Pemesanan Content</h2>
+            <div class="riwayat-header">
+                <h2>Riwayat Pemesanan</h2>
+                <p>Semua pesanan yang pernah Anda buat</p>
+            </div>
+
+            <div id="riwayat-list"></div>
         </div>
 
         <div id="pembayaran" class="tab-content">
@@ -285,5 +291,6 @@
 
     <script type="module" src="./typescript/dashboard.ts"></script>
     <script type="module" src="./typescript/book.ts"></script>
+    <script type="module" src="./typescript/riwayat.ts"></script>
 </body>
 </html>

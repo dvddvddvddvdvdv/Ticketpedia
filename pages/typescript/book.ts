@@ -390,6 +390,8 @@ function startCountdowns(): void {
 }
 
 function tick(): void {
+    const justExpired: string[] = [];
+
     document.querySelectorAll('#aktif .bk-row-bottom[data-expiry]').forEach(wrap => {
         const raw = (wrap as HTMLElement).dataset.expiry;
         const out = wrap.querySelector('.bk-countdown') as HTMLElement | null;
@@ -402,14 +404,8 @@ function tick(): void {
         const left = expiry - Date.now();
 
         if (left <= 0) {
-            out.textContent = '00:00:00';
-            out.classList.add('bk-countdown--urgent');
-            const btn = wrap.closest('.bk-booking')?.querySelector('.bk-pay') as HTMLButtonElement | null;
-            if (btn && !btn.disabled) {
-                btn.disabled = true;
-                btn.textContent = 'Kedaluwarsa';
-                btn.classList.add('bk-pay--expired');
-            }
+            const bookingId = (wrap.closest('.bk-card') as HTMLElement | null)?.dataset.id;
+            if (bookingId) justExpired.push(bookingId);
             return;
         }
 
@@ -420,6 +416,22 @@ function tick(): void {
         out.textContent = `${p(h)}:${p(m)}:${p(s)}`;
         out.classList.toggle('bk-countdown--urgent', left < 3600000);
     });
+
+    if (justExpired.length > 0) {
+        // Begitu waktunya habis, kartu langsung pindah ke tampilan
+        // "Kedaluwarsa" yang sudah ada (bukan cuma menonaktifkan tombol) —
+        // jadi otomatis hilang dari filter "Menunggu pembayaran".
+        justExpired.forEach(id => {
+            const b = allBookings.find(x => x.id === id);
+            if (b) b.status = 'expired';
+        });
+        // Ditunda ke luar tick() supaya renderBookings() (yang memanggil
+        // startCountdowns() -> tick() lagi) tidak rekursif dari sini.
+        setTimeout(() => {
+            renderBookings();
+            renderSummary(allBookings);
+        }, 0);
+    }
 }
 
 /* ---------- Payments (Bulk & Single) ---------- */
