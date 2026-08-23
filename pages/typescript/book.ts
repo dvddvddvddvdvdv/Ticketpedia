@@ -150,12 +150,20 @@ export function renderSummary(bookings: any[]): void {
     const pendingList = active.filter(b => getStatus(b) === 'pending');
     const percent = total > 0 ? Math.round((paid / total) * 100) : 0;
 
+    const daysToNext = active
+        .map(getDepartureDate)
+        .filter((d): d is Date => d instanceof Date && !isNaN(d.getTime()))
+        .map(d => Math.ceil((d.getTime() - Date.now()) / 86_400_000))
+        .filter(d => d >= 0)
+        .sort((a, b) => a - b)[0];
+
     setText('sum-total', formatRupiah(total));
     setText('sum-paid', formatRupiah(paid));
     setText('sum-due', formatRupiah(due));
     setText('sum-percent', `${percent}% lunas`);
     setText('sum-active', String(active.length));
     setText('sum-pending', String(pendingList.length));
+    setText('sum-next', daysToNext !== undefined ? `${daysToNext} hari` : '—');
 
     const bar = document.getElementById('sum-bar');
     if (bar) bar.style.width = `${percent}%`;
