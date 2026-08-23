@@ -45,6 +45,44 @@ function formatRupiah(n: number): string {
 
 let allFlights: any[] = [];
 
+/* ---------- Inventaris kursi (dibagi lintas akun) ---------- */
+
+// Jumlah pesanan aktif (bukan 'failed') per penerbangan, dihitung dari SEMUA
+// akun — bukan cuma milik user saat ini — supaya dua akun berbeda tidak bisa
+// sama-sama memesan kursi yang sama tanpa terdeteksi.
+let bookedCounts: Map<string, number> = new Map();
+
+async function loadBookedCounts(): Promise<void> {
+    try {
+        const bookings = await pb.collection('bookings').getFullList({
+            filter: 'status != "failed"',
+            fields: 'flight',
+        });
+        const counts = new Map<string, number>();
+        bookings.forEach((b: any) => {
+            const flightId = b.flight;
+            if (!flightId) return;
+            counts.set(flightId, (counts.get(flightId) || 0) + 1);
+        });
+        bookedCounts = counts;
+    } catch (error) {
+        console.error('Gagal memuat jumlah pesanan per penerbangan:', error);
+    }
+}
+
+// 'hk' adalah field jumlah kursi tersedia dari data flights (bervariasi per
+// baris, mis. 45/90), beda dengan 'total' yang tampaknya kapasitas pesawat
+// tetap (selalu 200). Kalau field ini keliru, cukup ganti nama field di sini.
+function seatCapacity(flight: any): number {
+    return Number(flight.hk) || 0;
+}
+
+function seatsRemaining(flight: any): number {
+    const capacity = seatCapacity(flight);
+    if (capacity <= 0) return Infinity; // tidak ada data kapasitas — jangan batasi
+    return capacity - (bookedCounts.get(flight.id) || 0);
+}
+
 /* ---------- Keranjang pesanan (belum dibayar) ---------- */
 
 interface CartItem {
@@ -140,6 +178,7 @@ loadFlights();
 async function loadFlights() {
     try {
         allFlights = await pb.collection('flights').getFullList();
+        await loadBookedCounts();
         renderFlights(allFlights);
         setupSearchFilter();
     } catch (error) {
@@ -169,6 +208,13 @@ function renderFlights(flightsToRender: any[]) {
         const logoSrc = `/Airlines/${encodeURIComponent(vendor)}.png`;
         const routeLabel = `${flight.rute1 ? parseRoute(flight.rute1).replace(/&rarr;|&amp;/g, ' - ') : ''}`;
         const inCart = cart.has(flight.id);
+
+        const remaining = seatsRemaining(flight);
+        const soldOut = remaining <= 0;
+        const lowStock = !soldOut && remaining !== Infinity && remaining <= 5;
+
+        let pilihLabel = inCart ? 'Batalkan' : 'Pilih Tiket';
+        if (soldOut && !inCart) pilihLabel = 'Tiket Habis';
 
         return `
         <div class="ticket-wrapper" data-flight-id="${esc(flight.id)}" data-price="${finalPrice}">
@@ -204,11 +250,12 @@ function renderFlights(flightsToRender: any[]) {
 
                 <div class="price-container">
                     <div class="duration">Durasi: ${esc(flight.prog)} (${esc(flight.day)})</div>
+                    ${lowStock ? `<div class="duration" style="color:#D97706;font-weight:600;">Sisa ${remaining} kursi</div>` : ''}
                     <div class="price">Rp ${formattedPrice}</div>
                 </div>
 
                 <div class="action-container">
-                    <button class="btn-pilih" type="button">${inCart ? 'Batalkan' : 'Pilih Tiket'}</button>
+                    <button class="btn-pilih" type="button" ${soldOut && !inCart ? 'disabled' : ''}>${esc(pilihLabel)}</button>
                 </div>
             </div>
 
@@ -367,6 +414,29 @@ document.addEventListener('click', async (ev) => {
 
         checkoutBtn.disabled = true;
         checkoutBtn.textContent = 'Memproses…';
+
+        // Cek ulang stok tepat sebelum membuat pesanan — akun lain bisa saja
+        // mengambil kursi terakhir sejak halaman ini pertama dimuat.
+        await loadBookedCounts();
+        const outOfStock: string[] = [];
+        cart.forEach((item, flightId) => {
+            const flight = allFlights.find(f => f.id === flightId);
+            if (flight && seatsRemaining(flight) <= 0) {
+                outOfStock.push(item.routeLabel || flightId);
+                cart.delete(flightId);
+            }
+        });
+
+        if (outOfStock.length > 0) {
+            alert(`Maaf, tiket berikut sudah habis dan dihapus dari pesanan:\n${outOfStock.join('\n')}`);
+            renderFlights(allFlights);
+            renderCartBar();
+            if (cart.size === 0) {
+                checkoutBtn.disabled = false;
+                checkoutBtn.textContent = 'Pesan Tiket';
+                return;
+            }
+        }
 
         const items = Array.from(cart.values());
         const failures: string[] = [];

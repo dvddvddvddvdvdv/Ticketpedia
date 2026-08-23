@@ -6,6 +6,34 @@ const API_BASE = 'https://db.zizazu.my.id';
 
 let allBookings: any[] = [];
 let activeFilter = 'all';
+let tickHandle: number | undefined;
+
+/* ---------- Penanda "sudah membuka Midtrans" (per booking) ---------- */
+
+// Countdown baru boleh muncul setelah pengguna benar-benar membuka popup
+// pembayaran Midtrans (klik "Bayar sekarang"/"Bayar sepenuhnya"), bukan
+// sejak booking dibuat saat checkout. Disimpan di localStorage supaya
+// tetap tersimpan walau halaman dimuat ulang.
+const ACCESSED_KEY = 'tp_midtrans_accessed';
+
+function getAccessedSet(): Set<string> {
+    try {
+        const raw = localStorage.getItem(ACCESSED_KEY);
+        return new Set(raw ? JSON.parse(raw) : []);
+    } catch {
+        return new Set();
+    }
+}
+
+function markAccessed(bookingIds: string[]): void {
+    const set = getAccessedSet();
+    bookingIds.forEach(id => set.add(id));
+    try {
+        localStorage.setItem(ACCESSED_KEY, JSON.stringify([...set]));
+    } catch {
+        // Storage penuh/diblokir — hanya berdampak kosmetik pada timer.
+    }
+}
 
 const cityNames: Record<string, string> = {
     CGK: 'Jakarta (CGK)',
@@ -204,6 +232,7 @@ function renderBookings() {
     }
 
     list.innerHTML = rows.map(cardHTML).join('');
+    startCountdowns();
 }
 
 function cardHTML(b: any): string {
@@ -307,7 +336,12 @@ function cardHTML(b: any): string {
         </div>`;
     }
 
-    // pending — tanpa countdown, hanya instruksi
+    // pending — countdown muncul hanya setelah Midtrans pernah dibuka
+    const accessed = getAccessedSet().has(b.id);
+    const rightCell = accessed
+        ? `<span class="bk-label">Sisa waktu</span><span class="bk-countdown">--:--:--</span>`
+        : `<span class="bk-note">Selesaikan pembayaran<br>sesuai instruksi</span>`;
+
     return `
     <div class="bk-card" data-id="${esc(b.id)}">
         ${airlineBlock}
@@ -324,18 +358,59 @@ function cardHTML(b: any): string {
                     <span class="bk-trip">${tripLabel}</span>
                 </div>
             </div>
-            <div class="bk-pending-row bk-row-bottom">
+            <div class="bk-pending-row bk-row-bottom" data-expiry="${accessed ? esc(b.expiry_time || '') : ''}">
                 <div class="bk-info-group">
                     <span class="bk-label">Total tagihan</span>
                     <span class="bk-price">${formatRupiah(amount)}</span>
                 </div>
                 <div class="bk-info-group bk-text-right">
-                    <span class="bk-note">Selesaikan pembayaran<br>sesuai instruksi</span>
+                    ${rightCell}
                 </div>
             </div>
-            <button class="bk-pay" data-order="${esc(b.order_id)}">Bayar sekarang</button>
+            <button class="bk-pay" data-order="${esc(b.order_id)}" data-booking-id="${esc(b.id)}">Bayar sekarang</button>
         </div>
     </div>`;
+}
+
+/* ---------- Countdown ---------- */
+
+function startCountdowns(): void {
+    if (tickHandle) window.clearInterval(tickHandle);
+    tick();
+    tickHandle = window.setInterval(tick, 1000);
+}
+
+function tick(): void {
+    document.querySelectorAll('#aktif .bk-row-bottom[data-expiry]').forEach(wrap => {
+        const raw = (wrap as HTMLElement).dataset.expiry;
+        const out = wrap.querySelector('.bk-countdown') as HTMLElement | null;
+        if (!raw || !out) return;
+
+        // Midtrans mengirim "2026-08-20 09:36:43" (WIB) — jadikan ISO
+        const expiry = new Date(raw.replace(' ', 'T') + '+07:00').getTime();
+        if (isNaN(expiry)) { out.textContent = '--:--:--'; return; }
+
+        const left = expiry - Date.now();
+
+        if (left <= 0) {
+            out.textContent = '00:00:00';
+            out.classList.add('bk-countdown--urgent');
+            const btn = wrap.closest('.bk-booking')?.querySelector('.bk-pay') as HTMLButtonElement | null;
+            if (btn && !btn.disabled) {
+                btn.disabled = true;
+                btn.textContent = 'Kedaluwarsa';
+                btn.classList.add('bk-pay--expired');
+            }
+            return;
+        }
+
+        const h = Math.floor(left / 3600000);
+        const m = Math.floor((left % 3600000) / 60000);
+        const s = Math.floor((left % 60000) / 1000);
+        const p = (n: number) => String(n).padStart(2, '0');
+        out.textContent = `${p(h)}:${p(m)}:${p(s)}`;
+        out.classList.toggle('bk-countdown--urgent', left < 3600000);
+    });
 }
 
 /* ---------- Payments (Bulk & Single) ---------- */
@@ -374,14 +449,20 @@ async function payAll(pendingList: any[], btn: HTMLButtonElement): Promise<void>
             throw new Error('Modul pembayaran belum termuat. Muat ulang halaman.');
         }
 
+        // Timer baru mulai berjalan sekarang — tandai semua tagihan dalam
+        // batch ini, lalu muat ulang supaya expiry_time terbaru terambil
+        // sebelum popup Midtrans dibuka.
+        markAccessed(pendingList.map(b => b.id));
+        await loadBookings();
+
         (window as any).snap.pay(data.token, {
             onSuccess: () => loadBookings(),
             onPending: () => loadBookings(),
             onError: () => {
                 alert('Pembayaran gagal. Silakan coba lagi.');
-                resetButton(btn);
+                loadBookings();
             },
-            onClose: () => resetButton(btn),
+            onClose: () => loadBookings(),
         });
     } catch (err) {
         console.error('Gagal membuat token pembayaran gabungan:', err);
@@ -415,6 +496,7 @@ document.addEventListener('click', async (ev) => {
     if (btn && !btn.disabled) {
         btn.disabled = true;
         btn.textContent = 'Memproses…';
+        const bookingId = btn.dataset.bookingId || '';
 
         const resetSingleBtn = () => {
             btn.disabled = false;
@@ -436,22 +518,23 @@ document.addEventListener('click', async (ev) => {
                 throw new Error(data.error || `Gagal memuat pembayaran (${res.status}).`);
             }
 
-            // Hook membuat order_id baru tiap kali bayar ulang —
-            // tombol harus ikut diperbarui, kalau tidak klik berikutnya
-            // akan gagal "Pesanan tidak ditemukan".
-            if (data.orderId) {
-                btn.dataset.order = data.orderId;
-            }
-
             if (!(window as any).snap) {
                 throw new Error('Modul pembayaran belum termuat. Muat ulang halaman.');
             }
 
+            // Timer baru mulai berjalan sekarang (Midtrans benar-benar
+            // dibuka) — tandai lalu muat ulang supaya order_id/expiry_time
+            // terbaru dari server ikut terambil sebelum popup dibuka. Ini
+            // juga menggantikan update manual btn.dataset.order lama, sebab
+            // seluruh list (termasuk tombol ini) dirender ulang dari server.
+            if (bookingId) markAccessed([bookingId]);
+            await loadBookings();
+
             (window as any).snap.pay(data.token, {
                 onSuccess: () => loadBookings(),
                 onPending: () => loadBookings(),
-                onError: resetSingleBtn,
-                onClose: resetSingleBtn,
+                onError: () => loadBookings(),
+                onClose: () => loadBookings(),
             });
         } catch (err) {
             alert(err instanceof Error ? err.message : 'Terjadi kesalahan.');
