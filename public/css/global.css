@@ -144,10 +144,27 @@ main {
 }
 
 .top-nav img {
-    width: 80px; 
+    width: 80px;
+}
+
+/* Struktur inti .top-icon/.diva/.user-profile/.divs sengaja ditulis ulang
+   di sini (bukan cuma diserahkan ke utility class Bootstrap) supaya nav
+   atas tidak berantakan/tumpang tindih dengan konten di bawahnya kalau
+   CDN Bootstrap lambat/gagal dimuat. */
+.top-icon {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 24px;
+}
+
+.diva {
+    flex-grow: 1;
 }
 
 .top-icon > a {
+    display: flex;
+    align-items: center;
     margin-right: 20px;
 }
 
@@ -156,11 +173,21 @@ main {
 }
 
 .user-profile {
-    border-color: #E9EAEE !important; /* Overrides Bootstrap's default gray border */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 2px solid #E9EAEE;
+    padding-left: 12px;
 }
 
 .user-profile a img {
     width: 60px;
+}
+
+.divs {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .username {
