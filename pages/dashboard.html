@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TicketPedia - Dashboard</title>
-    
+
     <!-- Added Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <link rel="stylesheet" href="/css/global.css">
     <link rel="stylesheet" href="/css/dashboard.css">
     <link rel="stylesheet" href="/css/tab-style/buy.css">
@@ -23,7 +23,7 @@
         <div class="nav">
             <div class="icon d-flex flex-column align-items-center gap-2">
                 <img class="title" src="assets/ticketpedia.png" alt="TicketPedia Logo">
-                
+
                 <!-- Added Bootstrap width and padding utilities -->
                 <div class="menu w-100 ps-3 pb-3">
                     <img src="assets/MENU.png" alt="Menu">
@@ -68,19 +68,19 @@
             <!-- Added Bootstrap flex, height, and padding utilities -->
             <div class="top-icon d-flex align-items-center h-100 px-4">
                 <img src="assets/logo.png" alt="">
-                
+
                 <!-- Added Bootstrap flex-grow to push items to the right -->
                 <div class="diva flex-grow-1"></div>
-                
+
                 <!-- Added Bootstrap flex utilities -->
                  <a href="../index.html" class="d-flex align-items-center"><img src="assets/Fpage.png" alt=""></a>
                 <a href="test.html" class="d-flex align-items-center"><img src="assets/Notif.png" alt=""></a>
                 <a href="#" class="d-flex align-items-center"><img src="assets/Email.png" alt=""></a>
-                
+
                 <!-- Added Bootstrap flex, border-left, and gap utilities -->
                 <div class="user-profile d-flex align-items-center gap-3 border-start border-2 ps-3">
                     <a href="#"><img class="Profile_picture rounded-circle" src="assets/profiles/p1.png" alt=""></a>
-                    
+
                     <!-- Added Bootstrap flex column utilities -->
                     <div class="divs d-flex flex-column justify-content-center">
                         <p id="navUsername" class="username fw-bold text-dark mb-0">Loading...</p>
@@ -123,16 +123,16 @@
 
         <!-- The Content Sections -->
         <div id="pembelian" class="tab-content active-content">
-            
+
             <!-- Added Bootstrap flexbox, alignment, and border-radius utilities here -->
             <div class="ticket-controls d-flex align-items-center">
                 <input type="text" class="search-bar border-0 rounded-pill shadow-none" placeholder="Search Bar">
-                
+
                 <button class="filter-btn border-0 rounded-pill d-flex align-items-center">
-                    Filter 
+                    Filter
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
                 </button>
-                
+
                 <button class="filter-tag border-0 rounded-pill d-flex align-items-center">Direct</button>
                 <button class="filter-tag border-0 rounded-pill d-flex align-items-center">Transit</button>
             </div>
@@ -140,7 +140,7 @@
             <div class="ticket-list"></div>
         </div>
 
-        
+
         <div id="aktif" class="tab-content">
             <div class="bk-header">
                 <h2>Informasi Pembookingan</h2>
@@ -149,7 +149,7 @@
 
             <!-- ==== ADDED WRAPPER START ==== -->
             <div class="bk-summary-wrapper">
-                
+
                 <!-- Ringkasan pembayaran -->
                 <div class="bk-summary">
                     <div class="bk-summary-main">
@@ -212,8 +212,8 @@
                         <p class="bk-support-hours">Senin&ndash;Sabtu, 08.00&ndash;20.00 WIB</p>
                     </div>
                 </div>
-            
-            </div> 
+
+            </div>
             <!-- ==== ADDED WRAPPER END ==== -->
 
             <div class="bk-filters">
@@ -229,11 +229,11 @@
         <div id="riwayat" class="tab-content">
             <h2>Riwayat Pemesanan Content</h2>
         </div>
-        
+
         <div id="pembayaran" class="tab-content">
             <div class="payment-card-container">
                 <h2 class="section-title">Konfirmasi Pembayaran</h2>
-                
+
                 <div class="payment-form-grid">
                     <!-- Kolom 1: Informasi Tagihan -->
                     <div class="form-column">
@@ -241,7 +241,7 @@
                             <label>Booking ID (PNR)</label>
                             <input type="text" class="booking-input" value="97CMS8" disabled style="background-color: #E9EAEE; cursor: not-allowed;">
                         </div>
-                        
+
                         <div class="input-group">
                             <label>Total Tagihan</label>
                             <input type="text" class="booking-input" value="Rp 18.450.000" disabled style="background-color: #E9EAEE; cursor: not-allowed;">

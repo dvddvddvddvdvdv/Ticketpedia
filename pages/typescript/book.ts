@@ -138,16 +138,25 @@ export async function loadBookings() {
     }
 
     try {
+        // PENTING: koleksi 'bookings' bisa dibaca publik dan TIDAK otomatis
+        // dibatasi per pemilik oleh PocketBase — tanpa filter di sini,
+        // setiap akun akan melihat pesanan SEMUA akun lain. Filter ini yang
+        // membuat inventaris pesanan benar-benar individual per akun.
+        const userId = pb.authStore.model?.id;
+        const ownerFilter = userId ? pb.filter('user = {:userId}', { userId }) : 'id = ""';
+
         let res;
         try {
             res = await pb.collection('bookings').getList(1, 50, {
                 sort: '-created',
                 expand: 'flight,flightId',
+                filter: ownerFilter,
             });
         } catch {
             // Fallback kalau field autodate 'created' belum ada
             res = await pb.collection('bookings').getList(1, 50, {
                 expand: 'flight,flightId',
+                filter: ownerFilter,
             });
         }
         allBookings = res.items;

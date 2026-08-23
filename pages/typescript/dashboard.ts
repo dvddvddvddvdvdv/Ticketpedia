@@ -126,8 +126,8 @@ function renderCartBar() {
 /* ---------- Auth & role (unchanged) ---------- */
 
 const isGuest = !pb.authStore.isValid;
-const user = pb.authStore.record;
-const isAdmin = pb.authStore.isSuperuser;
+const user = pb.authStore.model;
+const isAdmin = pb.authStore.isAdmin;
 
 const userRole = user ? (user.vendor || 'user') : null;
 const isStandardUser = userRole === 'user' && !isAdmin;
@@ -142,7 +142,7 @@ if (!isGuest && user) {
     if (emailEl) emailEl.textContent = user.email || '';
 } else if (isAdmin) {
     if (usernameEl) usernameEl.textContent = 'Admin';
-    if (emailEl) emailEl.textContent = pb.authStore.record?.email || '';
+    if (emailEl) emailEl.textContent = pb.authStore.model?.email || '';
 } else {
     if (usernameEl) usernameEl.textContent = 'Guest';
 }
