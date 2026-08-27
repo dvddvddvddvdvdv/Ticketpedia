@@ -8,33 +8,6 @@ let allBookings: any[] = [];
 let activeFilter = 'all';
 let tickHandle: number | undefined;
 
-/* ---------- Penanda "sudah membuka Midtrans" (per booking) ---------- */
-
-// Countdown baru boleh muncul setelah pengguna benar-benar membuka popup
-// pembayaran Midtrans (klik "Bayar sekarang"/"Bayar sepenuhnya"), bukan
-// sejak booking dibuat saat checkout. Disimpan di localStorage supaya
-// tetap tersimpan walau halaman dimuat ulang.
-const ACCESSED_KEY = 'tp_midtrans_accessed';
-
-function getAccessedSet(): Set<string> {
-    try {
-        const raw = localStorage.getItem(ACCESSED_KEY);
-        return new Set(raw ? JSON.parse(raw) : []);
-    } catch {
-        return new Set();
-    }
-}
-
-function markAccessed(bookingIds: string[]): void {
-    const set = getAccessedSet();
-    bookingIds.forEach(id => set.add(id));
-    try {
-        localStorage.setItem(ACCESSED_KEY, JSON.stringify([...set]));
-    } catch {
-        // Storage penuh/diblokir — hanya berdampak kosmetik pada timer.
-    }
-}
-
 const cityNames: Record<string, string> = {
     CGK: 'Jakarta (CGK)',
     JED: 'Jeddah (JED)',
@@ -110,7 +83,7 @@ function getAmount(b: any): number {
 function getStatus(b: any): 'paid' | 'pending' | 'failed' {
     const raw = String(b.status ?? '').toLowerCase();
     if (['paid', 'settlement', 'capture', 'success', 'lunas'].includes(raw)) return 'paid';
-    if (['expire', 'expired', 'cancel', 'deny', 'failure', 'failed'].includes(raw)) return 'failed';
+    if (['expire', 'expired', 'cancel', 'deny', 'failure', 'failed', 'falied'].includes(raw)) return 'failed';
     return 'pending';
 }
 
@@ -138,10 +111,6 @@ export async function loadBookings() {
     }
 
     try {
-        // PENTING: koleksi 'bookings' bisa dibaca publik dan TIDAK otomatis
-        // dibatasi per pemilik oleh PocketBase — tanpa filter di sini,
-        // setiap akun akan melihat pesanan SEMUA akun lain. Filter ini yang
-        // membuat inventaris pesanan benar-benar individual per akun.
         const userId = pb.authStore.model?.id;
         const ownerFilter = userId ? pb.filter('user = {:userId}', { userId }) : 'id = ""';
 
@@ -153,7 +122,6 @@ export async function loadBookings() {
                 filter: ownerFilter,
             });
         } catch {
-            // Fallback kalau field autodate 'created' belum ada
             res = await pb.collection('bookings').getList(1, 50, {
                 expand: 'flight,flightId',
                 filter: ownerFilter,
@@ -272,13 +240,11 @@ function cardHTML(b: any): string {
                     <span>${esc(b.passenger_name)}</span>
                 </div>
             </div>
-
             <button class="bk-leg-toggle" type="button" data-leg="pergi">
                 <img class="bk-leg-icon" src="/icon/plane-icon.png" alt="">
                 <span>penerbangan pergi</span>
             </button>
         </div>
-
         <div class="bk-divider"></div>`;
 
     const airlineBlock = `
@@ -292,7 +258,6 @@ function cardHTML(b: any): string {
         <div class="bk-card" data-id="${esc(b.id)}">
             ${airlineBlock}
             ${detailsBlock}
-
             <div class="bk-booking">
                 <div class="bk-booking-info">
                     <div class="bk-info-group">
@@ -319,12 +284,10 @@ function cardHTML(b: any): string {
 
     if (status === 'failed') {
         const flightId = esc(f.id || '');
-
         return `
         <div class="bk-card bk-card--expired" data-id="${esc(b.id)}">
             ${airlineBlock}
             ${detailsBlock}
-
             <div class="bk-booking bk-booking-pending">
                 <div class="bk-pending-row">
                     <div class="bk-info-group">
@@ -350,9 +313,9 @@ function cardHTML(b: any): string {
         </div>`;
     }
 
-    // pending — countdown muncul hanya setelah Midtrans pernah dibuka
-    const accessed = getAccessedSet().has(b.id);
-    const rightCell = accessed
+    // pending — countdown shown only when Midtrans has set expiry_time via webhook
+    const hasExpiry = !!b.expiry_time;
+    const rightCell = hasExpiry
         ? `<span class="bk-label">Sisa waktu</span><span class="bk-countdown">--:--:--</span>`
         : `<span class="bk-note">Selesaikan pembayaran<br>sesuai instruksi</span>`;
 
@@ -360,7 +323,6 @@ function cardHTML(b: any): string {
     <div class="bk-card" data-id="${esc(b.id)}">
         ${airlineBlock}
         ${detailsBlock}
-
         <div class="bk-booking bk-booking-pending">
             <div class="bk-pending-row">
                 <div class="bk-info-group">
@@ -372,7 +334,7 @@ function cardHTML(b: any): string {
                     <span class="bk-trip">${tripLabel}</span>
                 </div>
             </div>
-            <div class="bk-pending-row bk-row-bottom" data-expiry="${accessed ? esc(b.expiry_time || '') : ''}">
+            <div class="bk-pending-row bk-row-bottom" data-expiry="${esc(b.expiry_time || '')}">
                 <div class="bk-info-group">
                     <span class="bk-label">Total tagihan</span>
                     <span class="bk-price">${formatRupiah(amount)}</span>
@@ -402,7 +364,6 @@ function tick(): void {
         const out = wrap.querySelector('.bk-countdown') as HTMLElement | null;
         if (!raw || !out) return;
 
-        // Midtrans mengirim "2026-08-20 09:36:43" (WIB) — jadikan ISO
         const expiry = new Date(raw.replace(' ', 'T') + '+07:00').getTime();
         if (isNaN(expiry)) { out.textContent = '--:--:--'; return; }
 
@@ -423,15 +384,10 @@ function tick(): void {
     });
 
     if (justExpired.length > 0) {
-        // Begitu waktunya habis, kartu langsung pindah ke tampilan
-        // "Kedaluwarsa" yang sudah ada (bukan cuma menonaktifkan tombol) —
-        // jadi otomatis hilang dari filter "Menunggu pembayaran".
         justExpired.forEach(id => {
             const b = allBookings.find(x => x.id === id);
             if (b) b.status = 'expired';
         });
-        // Ditunda ke luar tick() supaya renderBookings() (yang memanggil
-        // startCountdowns() -> tick() lagi) tidak rekursif dari sini.
         setTimeout(() => {
             renderBookings();
             renderSummary(allBookings);
@@ -450,7 +406,6 @@ async function payAll(pendingList: any[], btn: HTMLButtonElement): Promise<void>
 
     const jumlah = pendingList.length;
     const totalDue = pendingList.reduce((sum, b) => sum + getAmount(b), 0);
-
     if (!confirm(`Bayar ${jumlah} tagihan sekaligus senilai ${formatRupiah(totalDue)}?`)) return;
 
     btn.disabled = true;
@@ -463,9 +418,7 @@ async function payAll(pendingList: any[], btn: HTMLButtonElement): Promise<void>
                 'Content-Type': 'application/json',
                 'Authorization': pb.authStore.token,
             },
-            body: JSON.stringify({
-                bookingIds: pendingList.map(b => b.id),
-            }),
+            body: JSON.stringify({ bookingIds: pendingList.map(b => b.id) }),
         });
 
         const data = await res.json().catch(() => ({}));
@@ -475,19 +428,12 @@ async function payAll(pendingList: any[], btn: HTMLButtonElement): Promise<void>
             throw new Error('Modul pembayaran belum termuat. Muat ulang halaman.');
         }
 
-        // Timer baru mulai berjalan sekarang — tandai semua tagihan dalam
-        // batch ini, lalu muat ulang supaya expiry_time terbaru terambil
-        // sebelum popup Midtrans dibuka.
-        markAccessed(pendingList.map(b => b.id));
         await loadBookings();
 
         (window as any).snap.pay(data.token, {
             onSuccess: () => loadBookings(),
             onPending: () => loadBookings(),
-            onError: () => {
-                alert('Pembayaran gagal. Silakan coba lagi.');
-                loadBookings();
-            },
+            onError: () => { alert('Pembayaran gagal. Silakan coba lagi.'); loadBookings(); },
             onClose: () => loadBookings(),
         });
     } catch (err) {
@@ -507,7 +453,6 @@ function resetButton(btn: HTMLButtonElement) {
 document.addEventListener('click', async (ev) => {
     const target = ev.target as HTMLElement;
 
-    // Filter toggle
     const filter = target.closest('.bk-filter') as HTMLElement | null;
     if (filter) {
         document.querySelectorAll('.bk-filter').forEach(f => f.classList.remove('active'));
@@ -517,12 +462,10 @@ document.addEventListener('click', async (ev) => {
         return;
     }
 
-    // Tombol bayar per tiket
     const btn = target.closest('.bk-pay') as HTMLButtonElement | null;
     if (btn && !btn.disabled) {
         btn.disabled = true;
         btn.textContent = 'Memproses…';
-        const bookingId = btn.dataset.bookingId || '';
 
         const resetSingleBtn = () => {
             btn.disabled = false;
@@ -548,12 +491,6 @@ document.addEventListener('click', async (ev) => {
                 throw new Error('Modul pembayaran belum termuat. Muat ulang halaman.');
             }
 
-            // Timer baru mulai berjalan sekarang (Midtrans benar-benar
-            // dibuka) — tandai lalu muat ulang supaya order_id/expiry_time
-            // terbaru dari server ikut terambil sebelum popup dibuka. Ini
-            // juga menggantikan update manual btn.dataset.order lama, sebab
-            // seluruh list (termasuk tombol ini) dirender ulang dari server.
-            if (bookingId) markAccessed([bookingId]);
             await loadBookings();
 
             (window as any).snap.pay(data.token, {
@@ -569,9 +506,6 @@ document.addEventListener('click', async (ev) => {
         return;
     }
 
-    // Pesan lagi — kembali ke tab Pembelian Tiket dan sorot penerbangan yang
-    // sama, supaya harga/kursi tersedia dicek ulang lewat alur normal
-    // (bukan membuat pesanan baru diam-diam dari sini).
     const rebookBtn = target.closest('.bk-rebook') as HTMLButtonElement | null;
     if (rebookBtn) {
         const flightId = rebookBtn.dataset.flightId;
@@ -591,7 +525,6 @@ document.addEventListener('click', async (ev) => {
         return;
     }
 
-    // Hapus pesanan yang sudah kedaluwarsa dari daftar
     const deleteBtn = target.closest('.bk-delete') as HTMLButtonElement | null;
     if (deleteBtn) {
         const bookingId = deleteBtn.dataset.bookingId;
@@ -615,7 +548,6 @@ document.addEventListener('click', async (ev) => {
         return;
     }
 
-    // Toggle pergi / pulang
     const toggle = target.closest('.bk-leg-toggle') as HTMLElement | null;
     if (toggle) {
         const card = toggle.closest('.bk-card');
@@ -642,7 +574,6 @@ aktifTab?.addEventListener('click', () => {
     if (allBookings.length === 0) loadBookings();
 }, { once: true });
 
-// Kalau tab sudah aktif saat halaman dimuat
 if (document.querySelector('#aktif.active-content')) {
     loadBookings();
 }

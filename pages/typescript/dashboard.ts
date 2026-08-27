@@ -77,22 +77,34 @@ function seatCapacity(flight: any): number {
     return Number(flight.hk) || 0;
 }
 
-function seatsRemaining(flight: any): number {
-    const capacity = seatCapacity(flight);
-    if (capacity <= 0) return Infinity; // tidak ada data kapasitas — jangan batasi
-    return capacity - (bookedCounts.get(flight.id) || 0);
+function seatsRemaining(_flight: any): number {
+    // Field 'hk' bukan inventaris kursi yang sebenarnya (nilainya 45/90 untuk
+    // semua rute), jadi tidak dipakai untuk membatasi pemesanan.
+    return Infinity;
 }
 
 /* ---------- Keranjang pesanan (belum dibayar) ---------- */
 
 interface CartItem {
+    itemId: string;
     flightId: string;
     routeLabel: string;
     passengerName: string;
     price: number; // per orang, dalam rupiah
 }
 
-const cart = new Map<string, CartItem>(); // key: flightId
+const cart = new Map<string, CartItem>(); // key: itemId (boleh banyak per flight)
+
+function cartHasFlight(flightId: string): boolean {
+    for (const item of cart.values()) if (item.flightId === flightId) return true;
+    return false;
+}
+
+function cartCountFlight(flightId: string): number {
+    let n = 0;
+    for (const item of cart.values()) if (item.flightId === flightId) n++;
+    return n;
+}
 
 function cartTotal(): number {
     let sum = 0;
@@ -207,13 +219,14 @@ function renderFlights(flightsToRender: any[]) {
         const vendor = String(flight.vendor || 'Garuda');
         const logoSrc = `/Airlines/${encodeURIComponent(vendor)}.png`;
         const routeLabel = `${flight.rute1 ? parseRoute(flight.rute1).replace(/&rarr;|&amp;/g, ' - ') : ''}`;
-        const inCart = cart.has(flight.id);
+        const seatsInCart = cartCountFlight(flight.id);
+        const inCart = seatsInCart > 0;
 
         const remaining = seatsRemaining(flight);
         const soldOut = remaining <= 0;
         const lowStock = !soldOut && remaining !== Infinity && remaining <= 5;
 
-        let pilihLabel = inCart ? 'Batalkan' : 'Pilih Tiket';
+        let pilihLabel = inCart ? `Tambah lagi (${seatsInCart})` : 'Pilih Tiket';
         if (soldOut && !inCart) pilihLabel = 'Tiket Habis';
 
         return `
@@ -267,7 +280,7 @@ function renderFlights(flightsToRender: any[]) {
                     <div class="input-group" style="flex-grow:1;">
                         <label>Nama Lengkap (Sesuai KTP/Paspor)</label>
                         <input type="text" class="booking-input" data-field="name"
-                               placeholder="Masukkan nama lengkap" value="${esc(cart.get(flight.id)?.passengerName || '')}">
+                               placeholder="Masukkan nama lengkap" value="">
                     </div>
                 </div>
 
@@ -275,15 +288,15 @@ function renderFlights(flightsToRender: any[]) {
                     <div class="total-price">
                         Harga per orang: <span>Rp ${formattedPrice}</span>
                     </div>
-                    <button class="btn-lanjut" type="button">${inCart ? 'Perbarui di Pesanan' : 'Tambah ke Pesanan'}</button>
+                    <button class="btn-lanjut" type="button">Tambah ke Pesanan</button>
                 </div>
             </div>
         </div>`;
     }).join('');
 
     // Buka kembali kartu yang sudah ada di keranjang, biar terlihat jelas
-    cart.forEach((_item, flightId) => {
-        const wrapper = container.querySelector(`[data-flight-id="${flightId}"]`);
+    cart.forEach((item) => {
+        const wrapper = container.querySelector(`[data-flight-id="${item.flightId}"]`);
         wrapper?.classList.add('active-booking');
     });
 }
@@ -348,14 +361,6 @@ document.addEventListener('click', async (ev) => {
         const wrapper = pilihBtn.closest('.ticket-wrapper') as HTMLElement;
         const flightId = wrapper?.dataset.flightId;
 
-        if (flightId && cart.has(flightId)) {
-            // Sudah ada di keranjang — klik ini membatalkannya
-            cart.delete(flightId);
-            renderFlights(allFlights);
-            renderCartBar();
-            return;
-        }
-
         wrapper?.classList.toggle('active-booking');
         pilihBtn.innerText = wrapper?.classList.contains('active-booking') ? 'Batalkan' : 'Pilih Tiket';
         return;
@@ -380,7 +385,10 @@ document.addEventListener('click', async (ev) => {
         }
 
         const routeEl = wrapper.querySelector('.route');
-        cart.set(flightId, {
+        const itemId = flightId + '-' + Date.now() + '-' +
+            Math.random().toString(36).slice(2, 7);
+        cart.set(itemId, {
+            itemId,
             flightId,
             routeLabel: routeEl?.textContent || '',
             passengerName,
@@ -419,11 +427,11 @@ document.addEventListener('click', async (ev) => {
         // mengambil kursi terakhir sejak halaman ini pertama dimuat.
         await loadBookedCounts();
         const outOfStock: string[] = [];
-        cart.forEach((item, flightId) => {
-            const flight = allFlights.find(f => f.id === flightId);
+        cart.forEach((item, itemId) => {
+            const flight = allFlights.find(f => f.id === item.flightId);
             if (flight && seatsRemaining(flight) <= 0) {
-                outOfStock.push(item.routeLabel || flightId);
-                cart.delete(flightId);
+                outOfStock.push(item.routeLabel || item.flightId);
+                cart.delete(itemId);
             }
         });
 
@@ -444,17 +452,16 @@ document.addEventListener('click', async (ev) => {
 
         for (const item of items) {
             try {
-                const res = await fetch(`${API_BASE}/api/midtrans/token`, {
+                const res = await fetch(`${API_BASE}/api/bookings/create`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': pb.authStore.token,
                     },
-                    // Endpoint ini membuat booking berstatus "pending" dan
-                    // mengembalikan Snap token — kita hanya memakai efek
-                    // sampingnya (record pending) dan sengaja TIDAK
-                    // memanggil snap.pay() di sini. Pembayaran dilakukan
-                    // belakangan lewat tombol "Bayar sekarang" di Tiket Aktif.
+                    // Endpoint ini HANYA membuat record booking pending.
+                    // Transaksi Midtrans dibuat belakangan lewat tombol
+                    // "Bayar sekarang" di Tiket Aktif, supaya tidak ada
+                    // transaksi hantu yang kedaluwarsa sendiri.
                     body: JSON.stringify({
                         flightId: item.flightId,
                         name: item.passengerName,

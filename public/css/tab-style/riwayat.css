@@ -28,7 +28,8 @@
 .riwayat-row {
     display: flex;
     align-items: center;
-    gap: 16px;
+    margin-bottom: 12px;
+    gap: 30px;
     padding: 14px 18px;
     background-color: #FFFFFF;
     border: 1px solid var(--bk-border, #E5E7EB);
