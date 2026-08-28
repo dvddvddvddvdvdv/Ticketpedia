@@ -1,0 +1,373 @@
+
+routerAdd("POST", "/api/bookings/create", (e) => {
+    const info = e.requestInfo();
+    if (!info.auth) return e.json(401, { error: "Silakan login terlebih dahulu." });
+
+    const body = info.body || {};
+    const flightId = String(body.flightId || "");
+    const passengerName = String(body.name || "").trim();
+
+    if (!flightId) return e.json(400, { error: "flightId wajib diisi." });
+    if (!passengerName) return e.json(400, { error: "Nama penumpang wajib diisi." });
+
+    let flight;
+    try {
+        flight = $app.findRecordById("flights", flightId);
+    } catch (err) {
+        return e.json(404, { error: "Penerbangan tidak ditemukan." });
+    }
+
+    const jual = Number(flight.get("jual")) || 0;
+    const markup = Number(flight.get("markup")) || 0;
+    const amount = Math.round((jual + markup) * 1000);
+    if (amount < 1) return e.json(400, { error: "Harga tiket tidak valid." });
+
+    const orderId = "TICKET-" + $security.randomString(12);
+
+    try {
+        const coll = $app.findCollectionByNameOrId("bookings");
+        const rec = new Record(coll);
+        rec.set("order_id", orderId);
+        rec.set("flight", flightId);
+        rec.set("user", info.auth.id);
+        rec.set("passenger_name", passengerName);
+        rec.set("amount", amount);
+        rec.set("status", "pending");
+        rec.set("expiry_time", "");
+        rec.set("midtrans_order_id", "");
+        rec.set("pay_attempt", 0);
+        $app.save(rec);
+
+        console.log("BOOKING dibuat:", orderId, "amount:", amount);
+        return e.json(200, { orderId: orderId, amount: amount, id: rec.id });
+    } catch (err) {
+        console.log("Gagal simpan booking:", err.toString());
+        return e.json(500, { error: "Gagal menyimpan pesanan." });
+    }
+});
+
+routerAdd("POST", "/api/midtrans/token", (e) => {
+    function b64encode(str) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        let out = "", i = 0;
+        while (i < str.length) {
+            const c1 = str.charCodeAt(i++);
+            const c2 = str.charCodeAt(i++);
+            const c3 = str.charCodeAt(i++);
+            const e1 = c1 >> 2;
+            const e2 = ((c1 & 3) << 4) | (c2 >> 4);
+            let e3 = ((c2 & 15) << 2) | (c3 >> 6);
+            let e4 = c3 & 63;
+            if (isNaN(c2)) { e3 = 64; e4 = 64; }
+            else if (isNaN(c3)) { e4 = 64; }
+            out += chars.charAt(e1) + chars.charAt(e2)
+                 + (e3 === 64 ? "=" : chars.charAt(e3))
+                 + (e4 === 64 ? "=" : chars.charAt(e4));
+        }
+        return out;
+    }
+
+    const info = e.requestInfo();
+    if (!info.auth) return e.json(401, { error: "Silakan login terlebih dahulu." });
+
+    const orderId = String((info.body || {}).orderId || "");
+    if (!orderId) return e.json(400, { error: "orderId wajib diisi." });
+
+    let rec;
+    try {
+        rec = $app.findFirstRecordByData("bookings", "order_id", orderId);
+    } catch (err) {
+        return e.json(404, { error: "Pesanan tidak ditemukan." });
+    }
+
+    if (rec.getString("user") !== info.auth.id)
+        return e.json(403, { error: "Pesanan ini bukan milik Anda." });
+    if (rec.getString("status") !== "pending")
+        return e.json(400, { error: "Pesanan ini sudah tidak bisa dibayar." });
+
+    const amount = Math.round(Number(rec.get("amount")) || 0);
+    if (amount < 1) return e.json(400, { error: "Harga tiket tidak valid." });
+
+    const serverKey = $os.getenv("MIDTRANS_SERVER_KEY");
+    if (!serverKey) return e.json(500, { error: "MIDTRANS_SERVER_KEY belum diset." });
+
+    const isSandbox = $os.getenv("MIDTRANS_ENV") !== "production";
+    const snapUrl = isSandbox
+        ? "https://app.sandbox.midtrans.com/snap/v1/transactions"
+        : "https://app.midtrans.com/snap/v1/transactions";
+
+    const attempt = (Number(rec.get("pay_attempt")) || 0) + 1;
+    const mOrderId = orderId + "-R" + attempt + $security.randomString(3);
+
+    const res = $http.send({
+        url: snapUrl,
+        method: "POST",
+        timeout: 30,
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Basic " + b64encode(serverKey + ":")
+        },
+        body: JSON.stringify({
+            transaction_details: { order_id: mOrderId, gross_amount: amount },
+            customer_details: {
+                first_name: rec.getString("passenger_name") || "Tamu",
+                email: info.auth.getString("email") || ""
+            },
+            expiry: { unit: "hours", duration: 24 }
+        })
+    });
+
+    console.log("DEBUG Midtrans response:", res.statusCode, toString(res.body));
+    if (res.statusCode !== 201) {
+        return e.json(502, { error: "Ditolak oleh Midtrans", details: toString(res.body) });
+    }
+
+    try {
+        rec.set("midtrans_order_id", mOrderId);
+        rec.set("pay_attempt", attempt);
+        rec.set("expiry_time", "");
+        $app.save(rec);
+    } catch (err) {
+        console.log("Gagal update booking:", err.toString());
+    }
+
+    return e.json(200, {
+        token: res.json.token,
+        redirectUrl: res.json.redirect_url,
+        orderId: orderId,
+        amount: amount
+    });
+});
+
+routerAdd("POST", "/api/midtrans/token-bulk", (e) => {
+    function b64encode(str) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        let out = "", i = 0;
+        while (i < str.length) {
+            const c1 = str.charCodeAt(i++);
+            const c2 = str.charCodeAt(i++);
+            const c3 = str.charCodeAt(i++);
+            const e1 = c1 >> 2;
+            const e2 = ((c1 & 3) << 4) | (c2 >> 4);
+            let e3 = ((c2 & 15) << 2) | (c3 >> 6);
+            let e4 = c3 & 63;
+            if (isNaN(c2)) { e3 = 64; e4 = 64; }
+            else if (isNaN(c3)) { e4 = 64; }
+            out += chars.charAt(e1) + chars.charAt(e2)
+                 + (e3 === 64 ? "=" : chars.charAt(e3))
+                 + (e4 === 64 ? "=" : chars.charAt(e4));
+        }
+        return out;
+    }
+
+    const info = e.requestInfo();
+    if (!info.auth) return e.json(401, { error: "Silakan login terlebih dahulu." });
+
+    const ids = (info.body || {}).bookingIds;
+    if (!ids || !ids.length) return e.json(400, { error: "bookingIds wajib diisi." });
+    if (ids.length > 20) return e.json(400, { error: "Maksimal 20 tiket sekali bayar." });
+
+    const userId = info.auth.id;
+    const recs = [], items = [];
+    let total = 0, payerName = "Tamu";
+
+    for (let i = 0; i < ids.length; i++) {
+        let rec;
+        try {
+            rec = $app.findRecordById("bookings", String(ids[i]));
+        } catch (err) {
+            return e.json(404, { error: "Pesanan tidak ditemukan: " + ids[i] });
+        }
+        if (rec.getString("user") !== userId)
+            return e.json(403, { error: "Ada pesanan yang bukan milik Anda." });
+        if (rec.getString("status") !== "pending")
+            return e.json(400, { error: "Pesanan " + rec.getString("order_id") + " sudah tidak bisa dibayar." });
+
+        const amt = Math.round(Number(rec.get("amount")) || 0);
+        if (amt < 1) return e.json(400, { error: "Harga tidak valid pada pesanan " + rec.getString("order_id") });
+
+        total += amt;
+        recs.push(rec);
+        if (i === 0) payerName = rec.getString("passenger_name") || "Tamu";
+        items.push({
+            id: rec.getString("order_id").substring(0, 50),
+            price: amt,
+            quantity: 1,
+            name: ("Tiket " + (rec.getString("passenger_name") || "")).substring(0, 50)
+        });
+    }
+
+    if (total < 1) return e.json(400, { error: "Total tagihan tidak valid." });
+
+    const serverKey = $os.getenv("MIDTRANS_SERVER_KEY");
+    if (!serverKey) return e.json(500, { error: "MIDTRANS_SERVER_KEY belum diset." });
+
+    const isSandbox = $os.getenv("MIDTRANS_ENV") !== "production";
+    const snapUrl = isSandbox
+        ? "https://app.sandbox.midtrans.com/snap/v1/transactions"
+        : "https://app.midtrans.com/snap/v1/transactions";
+
+    const bulkOrderId = "BULK-" + $security.randomString(12);
+
+    const res = $http.send({
+        url: snapUrl,
+        method: "POST",
+        timeout: 30,
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Basic " + b64encode(serverKey + ":")
+        },
+        body: JSON.stringify({
+            transaction_details: { order_id: bulkOrderId, gross_amount: total },
+            item_details: items,
+            customer_details: {
+                first_name: payerName,
+                email: info.auth.getString("email") || ""
+            },
+            expiry: { unit: "hours", duration: 24 }
+        })
+    });
+
+    console.log("DEBUG Midtrans bulk response:", res.statusCode, toString(res.body));
+    if (res.statusCode !== 201) {
+        return e.json(502, { error: "Ditolak oleh Midtrans", details: toString(res.body) });
+    }
+
+    let saved = 0;
+    for (let i = 0; i < recs.length; i++) {
+        try {
+            recs[i].set("bulk_order_id", bulkOrderId);
+            recs[i].set("expiry_time", "");
+            $app.save(recs[i]);
+            saved++;
+        } catch (err) {
+            console.log("Gagal tandai bulk:", recs[i].getString("order_id"), err.toString());
+        }
+    }
+
+    console.log("BULK dibuat:", bulkOrderId, "jumlah:", saved, "total:", total);
+    return e.json(200, {
+        token: res.json.token,
+        redirectUrl: res.json.redirect_url,
+        orderId: bulkOrderId,
+        amount: total,
+        count: saved
+    });
+});
+
+routerAdd("POST", "/api/midtrans/notification", (e) => {
+    const n = e.requestInfo().body || {};
+    const serverKey = $os.getenv("MIDTRANS_SERVER_KEY");
+
+    const base = String(n.order_id) + String(n.status_code) +
+                 String(n.gross_amount) + serverKey;
+    const expected = $security.sha512(base);
+
+    if (expected !== n.signature_key) {
+        console.log("NOTIF MISMATCH:", n.order_id,
+                    "| status_code:", n.status_code,
+                    "| gross:", n.gross_amount,
+                    "| expected:", String(expected).substring(0, 16),
+                    "| got:", String(n.signature_key).substring(0, 16));
+        return e.json(403, { error: "Invalid signature" });
+    }
+
+    const status = String(n.transaction_status || "");
+    let newStatus = "pending";
+    if (status === "settlement" || (status === "capture" && n.fraud_status === "accept")) {
+        newStatus = "paid";
+    } else if (status === "deny" || status === "cancel" ||
+               status === "expire" || status === "failure") {
+        newStatus = "failed";
+    }
+
+    const expiryTime = String(n.expiry_time || "");
+    const paymentType = String(n.payment_type || "");
+    const mOrderId = String(n.order_id);
+
+    function applyTo(rec) {
+        if (rec.getString("status") === "paid" && newStatus !== "paid") {
+            console.log("NOTIF diabaikan, sudah lunas:", rec.getString("order_id"));
+            return false;
+        }
+        rec.set("status", newStatus);
+        if (paymentType) rec.set("payment_type", paymentType);
+        if (expiryTime) rec.set("expiry_time", expiryTime);
+        $app.save(rec);
+        return true;
+    }
+
+    let handled = false;
+
+    try {
+        const rec = $app.findFirstRecordByData("bookings", "midtrans_order_id", mOrderId);
+        applyTo(rec);
+        handled = true;
+        console.log("NOTIF updated ->", newStatus, mOrderId, "expiry:", expiryTime);
+    } catch (err) {
+        // lanjut
+    }
+
+    if (!handled) {
+        try {
+            const recs = $app.findRecordsByFilter(
+                "bookings", "bulk_order_id = {:oid}", "", 100, 0, { oid: mOrderId }
+            );
+            for (let i = 0; i < recs.length; i++) applyTo(recs[i]);
+            if (recs.length > 0) {
+                handled = true;
+                console.log("NOTIF bulk updated ->", newStatus, mOrderId, "jumlah:", recs.length);
+            }
+        } catch (err) {
+            console.log("NOTIF bulk lookup error:", err.toString());
+        }
+    }
+
+    if (!handled) {
+        try {
+            const rec = $app.findFirstRecordByData("bookings", "order_id", mOrderId);
+            applyTo(rec);
+            handled = true;
+            console.log("NOTIF legacy updated ->", newStatus, mOrderId);
+        } catch (err) {
+            // tidak ditemukan
+        }
+    }
+
+    if (!handled) console.log("NOTIF booking not found:", mOrderId);
+
+    return e.json(200, { received: true });
+});
+
+cronAdd("expirePendingBookings", "*/5 * * * *", () => {
+    const d = new Date(Date.now() + 7 * 3600 * 1000);
+    const pad = (n) => String(n).padStart(2, "0");
+    const nowWib = d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" +
+                   pad(d.getUTCDate()) + " " + pad(d.getUTCHours()) + ":" +
+                   pad(d.getUTCMinutes()) + ":" + pad(d.getUTCSeconds());
+
+    try {
+        const stale = $app.findRecordsByFilter(
+            "bookings",
+            "status = 'pending' && expiry_time != '' && expiry_time < {:now}",
+            "", 200, 0,
+            { now: nowWib }
+        );
+        let n = 0;
+        for (let i = 0; i < stale.length; i++) {
+            try {
+                stale[i].set("status", "failed");
+                $app.save(stale[i]);
+                n++;
+                console.log("CRON expired:", stale[i].getString("order_id"));
+            } catch (err) {
+                console.log("CRON gagal simpan:", stale[i].getString("order_id"), err.toString());
+            }
+        }
+        if (n > 0) console.log("CRON: menandai", n, "pesanan kedaluwarsa");
+    } catch (err) {
+        console.log("CRON expire error:", err.toString());
+    }
+});

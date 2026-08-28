@@ -54,7 +54,7 @@ function getExcelDate(serialNumber: unknown): Date | null {
 function formatDate(value: unknown): string {
     const d = getExcelDate(value);
     if (!d) return esc(value);
-    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' });
 }
 
 function formatRupiah(n: unknown): string {

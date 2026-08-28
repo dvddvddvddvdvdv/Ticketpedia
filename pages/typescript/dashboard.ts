@@ -19,7 +19,7 @@ function formatExcelDate(serialNumber: number | string): string {
     const serial = Number(serialNumber);
     if (!serial || isNaN(serial)) return String(serialNumber);
     const date = new Date(Math.round((serial - 25569) * 86400 * 1000));
-    return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+    return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', timeZone: 'UTC' });
 }
 
 function esc(value: unknown): string {
